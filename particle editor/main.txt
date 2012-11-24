@@ -1,0 +1,44 @@
+Private Sub Form_Load()
+    
+    If Not D3DUtil_Init(Me.hwnd, True, 0, 0, D3DDEVTYPE_HAL, Me) Then End
+
+    Me.Show
+
+    DoEvents
+    
+    Run = True
+    
+    Dim RenderRect As D3DRECT: With RenderRect: .x1 = 0: .x2 = 520: .y1 = 0: .y2 = 414: End With
+    
+    Dim LastCount As Long
+    Dim fpsCount  As Long
+
+    Do While Run = True
+        
+        g_dev.Clear 1, RenderRect, D3DCLEAR_TARGET, 0, 1, 0
+        g_dev.BeginScene
+
+            'Render
+         
+        g_dev.EndScene
+        g_dev.Present RenderRect, RenderRect, 0, ByVal 0&
+                
+        DoEvents
+        
+        'update the scene stats once per second
+        If GetTickCount() - LastCount >= 1000& Then
+            Me.Caption = "Particle Editor - FPS: " & CStr(fpsCount)
+            LastCount = GetTickCount()
+            fpsCount = 1&
+        End If
+        
+        'show frame rate and device statistics
+        fpsCount = fpsCount + 1&
+    
+    Loop
+    
+    D3DUtil_Destroy
+    
+    End
+    
+End Sub

@@ -1,32 +1,116 @@
-Attribute VB_Name = "D3DInit"
- 
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'
-' Copyright (C) 1999-2001 Microsoft Corporation.  All Rights Reserved.
-'
-' File:       D3DInit.bas
-' Content:    VB D3DFramework global initialization module
-'
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
- 
-'DOC:  Use with
-'DOC:        D3DAnimation.cls
-'DOC:        D3DFrame.cls
-'DOC:        D3DMesh.cls
-'DOC:        D3DSelectDevice.frm (optional)
-'DOC:
-'DOC:  Short list of usefull functions
-'DOC:        D3DUtil_Init                  first call to framework
-'DOC:        D3DUtil_LoadFromFile          loads an x-file
-'DOC:        D3DUtil_SetupDefaultScene     setup a camera lights and materials
-'DOC:        D3DUtil_SetupCamera           point camera
-'DOC:        D3DUtil_SetupMediaPath        set directory to load textures from
-'DOC:        D3DUtil_PresentAll            show graphic on the screen
-'DOC:        D3DUtil_ResizeWindowed        resize for windowed modes
-'DOC:        D3DUtil_ResizeFullscreen      resize to fullscreen mode
-'DOC:        D3DUtil_CreateTextureInPool   create a texture
- 
+Attribute VB_Name = "modDirectX"
 Option Explicit
+
+
+'  DXLockArray8 & DXUnlockArray8 (DOC)
+'
+'  These are Helper functions that allow textures, vertex buffers, and index buffers
+'  to look like VB arrays to the VB user.
+'  It is imperative that Lock be matched with unlock or undefined behaviour may result
+'  It is imperative that DXLockarray8 be matched with DXUnlockArray8 or undefined behaviour may result
+'
+'  ->DXLockArray8
+'        resource    - can be Direct3DTexture8,Direct3dVertexBuffer8, or a Direct3DIndexBuffer
+'        addr        - is the number provide by IndexBuffer.Lock,Testure.Lock etc
+'        arr()       - a VB array that can be used to shadow video memory
+'  ->DXUnlockArray8
+'        resource    - the resource passed to DXLockArray8
+'        arr()       - the VB array passed to DXLockArray8
+'
+'  ->Example
+'            dim m_vertBuff as Direct3DVertexBuffer  'we assume this has been created
+'            dim m_vertCount as long                 'we assume this has been set
+'
+'            Dim addr As Long                        'will holds the address the D3D
+'                                                    'managed memory
+'            dim verts() as D3DVERTEX                'array that we want to point to
+'                                                    'D3D managed memory
+'
+'            redim verts(m_vertCount)                'ensure the size is large
+'                                                    'enough for the data and has
+'                                                    'as many dimensions as needed
+'                                                    '(1d for vertex buffer, 2d for
+'                                                    'surfaces, 3d for volumes)
+'                                                    'resize the array once and
+'                                                    'reuse for frequent manipulation
+'
+'            m_vertBuff.Lock 0, Len(verts(0)) * m_vertCount, addr, 0
+'
+'            DXLockArray8 m_vertBuff, addr, verts
+'
+'            for i = 0 to m_vertCount-1
+'                verts(i).x=i 'or what ever you want to dow with the data
+'            next
+'
+'           DXUnlockArray8 m_vertBuff, verts
+'
+'           VB.Unlock
+
+Public Declare Function DXLockArray8 Lib "dx8vb.dll" (ByVal resource As Direct3DResource8, ByVal addr As Long, arr() As Any) As Long
+Public Declare Function DXUnlockArray8 Lib "dx8vb.dll" (ByVal resource As Direct3DResource8, arr() As Any) As Long
+
+'DOC: Texture Load data applied to all textures
+'DOC: can be accessed by g_TextureSampling variable
+Private Type TextureParams
+    enable As Boolean           'enable texture sampling
+     
+    width As Long               'default width of textures
+    height As Long              'default height of textures
+    miplevels As Long           'default number of miplevels
+    mipfilter As Long           'default mipmap filter
+    filter As Long              'default texture filter
+    fmt As CONST_D3DFORMAT      'default texture format
+    fmtTrans As CONST_D3DFORMAT 'default transparent format
+    colorTrans As Long          'default transparent color
+     
+End Type
+ 
+ 
+'DOC: Rotate key used in conjuction with the CD3DAnimation class
+Public Type D3DROTATEKEY
+    time As Long
+    nFloats As Long
+    quat As D3DQUATERNION
+End Type
+ 
+'DOC: Scale or Translate key used in conjuction with the CD3DAnimation class
+Public Type D3DVECTORKEY
+    time As Long
+    nFloats As Long
+    vec As D3DVECTOR
+End Type
+ 
+'DOC: Pick record using with CD3DPick class
+Public Type D3D_PICK_RECORD
+    hit As Long
+    triFaceid As Long
+    a       As Single
+    b       As Single
+    dist   As Single
+End Type
+ 
+'DOC: see D3DUtil_Timer
+Public Enum TIMER_COMMAND
+          TIMER_RESET = 1         '- to reset the timer
+          TIMER_start = 2         '- to start the timer
+          TIMER_STOP = 3          '- to stop (or pause) the timer
+          TIMER_ADVANCE = 4       '- to advance the timer by 0.1 seconds
+          TIMER_GETABSOLUTETIME = 5 '- to get the absolute system time
+          TIMER_GETAPPTIME = 6      '- to get the current time
+          TIMER_GETELLAPSEDTIME = 7 '- to get the ellapsed time
+End Enum
+ 
+ 
+'DOC: Info on a per texture basis
+Private Type TexPoolEntry
+    Name As String
+    tex As Direct3DTexture8
+    nextDelNode As Long
+End Type
+
+'''
+'' API Functions
+'''
 
 Public Declare Function GetTickCount Lib "kernel32" () As Long
  
@@ -37,11 +121,12 @@ Private Declare Function SetWindowLongA Lib "user32.dll" (ByVal hwnd As Long, By
 Private Declare Function GetWindowLongA Lib "user32.dll" (ByVal hwnd As Long, ByVal nIndex As Long) As Long
  
  
-'------------------------------------------------------------------
-' User Defined types
-'------------------------------------------------------------------
+'''
+'' User Defined types
+'''
  
-'DOC: Type that hold info about a display mode
+''
+' Type that hold info about a display mode
 Public Type D3DUTIL_MODEINFO
     lWidth As Long                                  'Screen width in this mode
     lHeight As Long                                 'Screen height in this mode
@@ -49,7 +134,8 @@ Public Type D3DUTIL_MODEINFO
     VertexBehavior As CONST_D3DCREATEFLAGS          'Whether this mode does SW or HW vertex processing
 End Type
  
-'DOC: Type that hold info about a particular back buffer format
+''
+' Type that hold info about a particular back buffer format
 Public Type D3DUTIL_FORMATINFO
     format As CONST_D3DFORMAT
     usage As Long
@@ -70,7 +156,8 @@ Public Type D3DUTIL_DEVTYPEINFO
      
 End Type
  
-'DOC: Type that holds info about adapters installed on the system
+''
+' Type that holds info about adapters installed on the system
 Public Type D3DUTIL_ADAPTERINFO
     'Device data
     DeviceType As CONST_D3DDEVTYPE                  'Reference, HAL
@@ -87,15 +174,13 @@ Public Type D3DUTIL_ADAPTERINFO
     'CurrentState
     bWindowed As Boolean        'currently in windowed mode
     bReference As Boolean       'currently using reference rasterizer
- 
-     
-     
+
 End Type
  
-'------------------------------------------------------------------
-'DOC: Usefull globals
-'------------------------------------------------------------------
-'
+'''
+'' Usefull globals
+'''
+
 Public g_Adapters() As D3DUTIL_ADAPTERINFO      'Array of Adapter infos
 Public g_lCurrentAdapter As Long                'current adapter (index into infos)
 Public g_lNumAdapters As Long                   'size of the g_Adapters array
@@ -105,7 +190,6 @@ Public g_dx As DirectX8                         'Root objects for DX8
 Public g_d3dx As D3DX8                          'Root objects for d3dx
 Public g_d3d As Direct3D8                       'Root object for d3d
 Public g_dev As Direct3DDevice8                 'D3D device
-     
                                                 'Current state (use as read only)
 Public g_d3dCaps As D3DCAPS8                    'Current caps of g_dev
 Public g_devType As CONST_D3DDEVTYPE            'Current device type (hardware or software)
@@ -113,74 +197,93 @@ Public g_behaviorflags As Long                  'Current VertexProcessing (hardw
 Public g_focushwnd As Long                      'Current focus window handle
 Public g_d3dpp As D3DPRESENT_PARAMETERS         'Current presentation parameters
  
-   
 Public g_lWindowWidth As Long                   'backbuffer width of windowed state
 Public g_lWindowHeight As Long                  'backbuffer  height of windowed state
 Public g_WindowRect As RECT                     'size of window (including title bar)
+
+''
+' Textures
+Public g_bDontDrawTextures As Boolean           'Debuging switches
+Public g_bClipMesh As Boolean                   'Debuging switches
+Public g_bLoadSkins  As Boolean                 'Debuging switches
+Public g_bLoadNoAlpha As Boolean                'Debuging switches
  
+''
+' view frustrum (use as read only)
+Public g_fov As Single                          'view frustrum field of view
+Public g_aspect As Single                       'view frustrum aspect ratio
+Public g_znear As Single                        'view frustrum near plane
+Public g_zfar As Single                         'view frustrom far plane
  
+''
+' Matrices (use as read only)
+Public g_identityMatrix As D3DMATRIX            'Filled with Identity Matrix after D3DUtil_Init
+Public g_worldMatrix As D3DMATRIX               'Filled with current world matrix
+Public g_viewMatrix As D3DMATRIX                'Filled with current view matrix
+Public g_projMatrix As D3DMATRIX                'Filled with current projection matrix
  
-'------------------------------------------------------------------
-'Public Functions
-'------------------------------------------------------------------
+''
+' Clipplanes: use to ComputeClipPlanes to initialize helpfull for view frustrum culling
+Public g_ClipPlanes() As D3DPLANE               'Clipplane plane array
+Public g_numClipPlanes As Long                  'Number of clip planes in g_ClipPlanes
  
-Sub D3DUtil_Destory()
-    Dim emptycaps As D3DCAPS8
-    Dim emptyrect As RECT
-    Dim emptypresent As D3DPRESENT_PARAMETERS
-     
-     
-     
-    Set g_dx = Nothing
-    Set g_d3dx = Nothing
-    Set g_dev = Nothing
-    Set g_EnumCallback = Nothing
-     
-    g_focushwnd = 0
-    g_behaviorflags = 0
-    g_lWindowWidth = 0
-    g_lWindowHeight = 0
-     
-    g_d3dCaps = emptycaps
-    g_d3dpp = emptypresent
-    g_WindowRect = emptyrect
-     
-    ReDim g_Adapters(0)
-    g_lNumAdapters = 0
-         
-End Sub
+Public light0 As D3DLIGHT8                      'light type usefull in imediate pane
+Public light1 As D3DLIGHT8                      'light type usefull in imediate pane
+   
+Public g_TextureSampling As TextureParams       'defines how CreateTextureInPool sample textures
  
-'-----------------------------------------------------------------------------
-'DOC: D3DUtil_Init
-'DOC:   This function creates the following objects: DirectX8, Direct3D8,
-'DOC:   Direc3DDevice8.
-'DOC:
-'DOC: Params:
-'DOC:   bWindowed       Start in full screen or windowed mode
-'DOC:
-'DOC:   hwnd            starting hwnd to display graphics in
-'DOC:                   This can be changed with a call to Reset if drawing
-'DOC:                   to multiple windows
-'DOC:                   For full screen operation the hwnd will have to belong
-'DOC:                   to a top level window
-'DOC:
-'DOC:   AdapterIndex    The index of the display card to be used (most often 0)
-'DOC:
-'DOC:   ModeIndex       Ignored if bWindowed is TRUE
-'DOC:                   Otherwise and index into the g_adapters(AdapterIndex).Modes
-'DOC:                   array for a given width height and backbuffer format
-'DOC:                   Use D3DUtil_FindDisplayMode to obtain an mode index given
-'DOC:                   a desired height width and backbuffer format
-'DOC:
-'DOC:   CallbackObject  Can be Nothing or an object that has implemented
-'DOC:                   VerifyDevice(usageflags as long ,format as CONST_D3DFORMAT)
-'DOC:
-'DOC:
-'DOC: Remarks:
-'DOC:   caps for the device are passed to VerifyDevice in the g_d3dcaps global
-'DOC:
-'-----------------------------------------------------------------------------
+Public g_TextureLoadCallback  As Object         'object that implements LoadTextureCallback(sName as string) as Direct3dTexture8
+Public g_bUseTextureLoadCallback As Boolean     'enables disables callback
+   
+Public g_mediaPath As String                    'Path to media and texture
+                                                'read/write - must have ending backslash
+                                                'best to use SetMediaPath to initialize
+
+'''
+'' Global constants
+'''
+
+Public Const g_pi = 3.1415
+Public Const g_InvertRotateKey = True   'flag to turn on fix for animation key problem
+Public Const D3DFVF_VERTEX = D3DFVF_XYZ Or D3DFVF_NORMAL Or D3DFVF_TEX1
  
+'''
+'' Locals
+'''
+
+'TexturePool Mangement data. see..
+' D3DUTIL_LoadTextureIntoPool
+' D3DUTIL_AddTextureToPool
+' D3DUTIL_ReleaseTextureFromPool
+' D3DUTIL_ReleaseAllTexturesFromPool
+'
+Dim m_texPool() As TexPoolEntry
+Dim m_maxPool As Long
+Dim m_nextEmpty As Long
+Dim m_firstDel As Long
+ 
+Const kGrowSize = 10
+
+'' D3DUtil_Init
+'  This function creates the following objects: DirectX8, Direct3D8, Direc3DDevice8.
+'
+' @param  bWindowed       Start in full screen or windowed mode
+' @param  hwnd            Starting hwnd to display graphics in
+'                         This can be changed with a call to Reset if drawing
+'                         to multiple windows
+'                         For full screen operation the hwnd will have to belong
+'                         to a top level window
+' @param  AdapterIndex    The index of the display card to be used (most often 0)
+' @param  ModeIndex       Ignored if bWindowed is TRUE
+'                         Otherwise and index into the g_adapters(AdapterIndex).Modes
+'                         array for a given width height and backbuffer format
+'                         Use D3DUtil_FindDisplayMode to obtain an mode index given
+'                         a desired height width and backbuffer format
+' @param  CallbackObject  Can be Nothing or an object that has implemented
+'                         VerifyDevice(usageflags as long ,format as CONST_D3DFORMAT)
+'
+' @remarks                Caps for the device are passed to VerifyDevice in the g_d3dcaps global
+
 Public Function D3DUtil_Init(hwnd As Long, bWindowed As Boolean, AdapterIndex As Long, modeIndex As Long, devtype As CONST_D3DDEVTYPE, CallbackObject As Object) As Boolean
      
     On Local Error GoTo errOut
@@ -207,10 +310,9 @@ Public Function D3DUtil_Init(hwnd As Long, bWindowed As Boolean, AdapterIndex As
 errOut:
     Debug.Print "Failed D3DUtil_Init"
 End Function
- 
- 
-''
-' This function creates the following objects: DirectX8, Direct3D8, Direc3DDevice8.
+
+'' D3DUtil_InitWindowed
+'  This function creates the following objects: DirectX8, Direct3D8, Direc3DDevice8.
 '
 ' @param  hwnd            Starting hwnd to display graphics in
 '                         This can be changed with a call to Reset if drawing
@@ -316,10 +418,7 @@ Function D3DUtil_InitWindowed(hwnd As Long, AdapterIndex As Long, devtype As CON
  
     'update our device caps data
     g_dev.GetDeviceCaps g_d3dCaps
-     
-    'set any state we need to initialize
-    D3DXMatrixIdentity g_identityMatrix
-     
+          
     'set the reference flag if we choose a ref device
     With g_Adapters(g_lCurrentAdapter)
         If .DeviceType = D3DDEVTYPE_REF Then
@@ -336,32 +435,23 @@ errOut:
     Debug.Print "Failed D3DUtil_Init"
  
 End Function
- 
- 
-'-----------------------------------------------------------------------------
-'DOC: D3DUtil_InitFullscreen
-'DOC:   This function creates the following objects: DirectX8, Direct3D8,
-'DOC:   Direc3DDevice8.
-'DOC:
-'DOC: Params:
-'DOC:
-'DOC:   hwnd            starting hwnd to display graphics in
-'DOC:                   This can be changed with a call to Reset if drawing
-'DOC:                   to multiple windows
-'DOC:                   For full screen operation the hwnd will have to belong
-'DOC:                   to a top level window
-'DOC:
-'DOC:   AdapterIndex    The index of the display card to be used (most often 0)
-'DOC:
-'DOC:   ModeIndex       index into the g_adapters(AdapterIndex).Modes for width
-'DOC:                   height and format
-'DOC:
-'DOC:   DevType         Indicates if user wants HAL (hardware) or REF (software) rendering
-'DOC:
-'DOC:   bTryFallbacks   True if wants function to attempt to fallback to the reference device
-'DOC:                   on faulure and display dialogs to that effect
-'DOC:
-'-----------------------------------------------------------------------------
+
+'' D3DUtil_InitFullscreen
+'  This function creates the following objects: DirectX8, Direct3D8, Direc3DDevice8.
+'
+' @param  hwnd            Starting hwnd to display graphics in
+'                         This can be changed with a call to Reset if drawing
+'                         to multiple windows
+'                         For full screen operation the hwnd will have to belong
+'                         to a top level window
+'
+' @param  AdapterIndex    The index of the display card to be used (most often 0)
+' @param  ModeIndex       index into the g_adapters(AdapterIndex).Modes for width
+'                         height and format
+' @param  DevType         Indicates if user wants HAL (hardware) or REF (software) rendering
+' @param  bTryFallbacks   True if wants function to attempt to fallback to the reference device
+'                         on faulure and display dialogs to that effect
+
 Function D3DUtil_InitFullscreen(hwnd As Long, AdapterIndex As Long, modeIndex As Long, devtype As CONST_D3DDEVTYPE, bTryFallbacks As Boolean) As Boolean
      
     On Error GoTo errOut
@@ -373,9 +463,7 @@ Function D3DUtil_InitFullscreen(hwnd As Long, AdapterIndex As Long, modeIndex As
     'save the current adapter
     g_lCurrentAdapter = AdapterIndex
          
-     
     g_focushwnd = hwnd
-     
      
     'switching from windowed to fullscreen so save height and width
     If g_d3dpp.Windowed = 1 Then
@@ -384,7 +472,6 @@ Function D3DUtil_InitFullscreen(hwnd As Long, AdapterIndex As Long, modeIndex As
         g_lWindowHeight = rc.bottom - rc.Top
         Call GetWindowRect(g_focushwnd, g_WindowRect)
     End If
- 
      
     'Initialize the present parameters structure
     'to use 1 back buffer and a 16 bit depth buffer
@@ -395,9 +482,6 @@ Function D3DUtil_InitFullscreen(hwnd As Long, AdapterIndex As Long, modeIndex As
         .AutoDepthStencilFormat = D3DFMT_D16
         .hDeviceWindow = g_focushwnd
     End With
-     
-     
-     
      
     With g_Adapters(g_lCurrentAdapter)
              
@@ -459,10 +543,7 @@ Function D3DUtil_InitFullscreen(hwnd As Long, AdapterIndex As Long, modeIndex As
  
     'update our device caps data
     g_dev.GetDeviceCaps g_d3dCaps
-     
-    'set any state we need to initialize
-    D3DXMatrixIdentity g_identityMatrix
-     
+          
     'set the reference flag if we choose a ref device
     With g_Adapters(g_lCurrentAdapter)
         If .DeviceType = D3DDEVTYPE_REF Then
@@ -477,15 +558,12 @@ Function D3DUtil_InitFullscreen(hwnd As Long, AdapterIndex As Long, modeIndex As
 errOut:
     Debug.Print "Failed D3DUtil_InitFullscreen"
 End Function
- 
- 
-'-----------------------------------------------------------------------------
-'DOC: D3DUtil_ResetWindowed
-'DOC:
-'DOC: Remarks
-'DOC:   Used to move out of Fullscreen mode to windowed mode with out changing
-'DOC:   the current device
-'-----------------------------------------------------------------------------
+
+'' D3DUtil_ResetWindowed
+'
+'  @remarks                Used to move out of Fullscreen mode to windowed mode with out changing
+'                          the current device
+
 Function D3DUtil_ResetWindowed() As Long
         Dim ws As Long
         Dim d3dppnew As D3DPRESENT_PARAMETERS
@@ -508,7 +586,6 @@ Function D3DUtil_ResetWindowed() As Long
         Const WS_EX_TOPMOST = 8
         Const HWND_NOTOPMOST = -2
              
-                 
         With g_WindowRect
             Call SetWindowPos(g_focushwnd, HWND_NOTOPMOST, .Left, .Top, .Right - .Left, .bottom - .Top, 0)
             ws = GetWindowLongA(g_focushwnd, GWL_STYLE)
@@ -517,8 +594,7 @@ Function D3DUtil_ResetWindowed() As Long
                 Call SetWindowLongA(g_focushwnd, GWL_STYLE, ws)
             End If
         End With
-         
-         
+
         DoEvents
         D3DUtil_ResetWindowed = 0
         Exit Function
@@ -527,14 +603,11 @@ errOut:
     Debug.Print "err in ResetWindow"
 End Function
  
- 
-'-----------------------------------------------------------------------------
-'DOC: D3DUtil_ResetFullscreen
-'DOC:
-'DOC: Remarks
-'DOC:   Used to to toggle from windowed mode to the current fullscreen mode
-'DOC:   Without changing the current device
-'-----------------------------------------------------------------------------
+'' D3DUtil_ResetWindowed
+'
+'  @remarks                Used to to toggle from windowed mode to the current fullscreen mode
+'                          Without changing the current device
+
 Function D3DUtil_ResetFullscreen() As Long
         Dim hr As Long
         Dim lMode As Long
@@ -561,20 +634,16 @@ errOut:
         D3DUtil_ResetFullscreen = Err.Number
 End Function
  
-'-----------------------------------------------------------------------------
-'DOC: D3DEnum_BuildAdapterList
-'DOC:   Used to intialzed a list of valid adapters and display modes
-'DOC:
-'DOC: Params:
-'DOC:   EnumCallback    - can be Nothing or an object that has implemented
-'DOC:                     VerifyDevice(usageflags as long ,format as CONST_D3DFORMAT)
-'DOC:                     ussgeflags can be
-'DOC:                           D3DCREATE_SOFTWARE_VERTEXPROCESSING
-'DOC:                           D3DCREATE_HARDWARE_VERTEXPROCESSING
-'DOC: Remarks:
-'DOC:   caps for the device are passed to VerifyDevice in the g_d3dcaps global
-'DOC:
-'-----------------------------------------------------------------------------
+'' D3DEnum_BuildAdapterList
+'  Used to intialzed a list of valid adapters and display modes
+'
+'    @param   EnumCallback    - can be Nothing or an object that has implemented
+'                               VerifyDevice(usageflags as long, format as CONST_D3DFORMAT)
+'                               ussgeflags can be
+'                               D3DCREATE_SOFTWARE_VERTEXPROCESSING
+'                               D3DCREATE_HARDWARE_VERTEXPROCESSING
+'  @remarks                     Caps for the device are passed to VerifyDevice in the g_d3dcaps global
+
 Public Function D3DEnum_BuildAdapterList(EnumCallback As Object) As Boolean
      
     On Local Error GoTo errOut
@@ -619,19 +688,13 @@ Public Function D3DEnum_BuildAdapterList(EnumCallback As Object) As Boolean
 errOut:
     Debug.Print "Failed D3DEnum_BuildAdapterList"
 End Function
- 
- 
- 
-'-----------------------------------------------------------------------------
-'DOC:  D3DUtil_ResizeWindowed
-'DOC:
-'DOC:  Paramters
-'DOC:       hWnd device window
-'DOCL
-'DOC:  Remarks
-'DOC:       use when already in windowed mode to resize the backbuffer
-'DOC:       do not use to switch from fullscreen to windowed mode
-'-----------------------------------------------------------------------------
+
+'' D3DUtil_ResizeWindowed
+'
+'  @param   hWnd     Device window
+'  @remarks          Use when already in windowed mode to resize the backbuffer
+'                    do not use to switch from fullscreen to windowed mode
+
 Function D3DUtil_ResizeWindowed(hwnd As Long) As Boolean
     On Local Error GoTo errOut
      
@@ -676,22 +739,18 @@ errOut:
 End Function
  
  
-'-----------------------------------------------------------------------------
-'DOC:  D3DUtil_ResizeFullscreen
-'DOC:
-'DOC:  Paramters
-'DOC:       hWnd device window
-'DOC:       modeIndex index into Modes list
-'DOC:
-'DOC:  Remarks
-'DOC:       D3DUtil_Init or D3DEnum_BuildAdapterList must have been called
-'DOC:       prior to call D3DUtil_ResizeFullscreen
-'DOC:       Use this method when moving from windowed mode to fullscreen
-'DOC:       on the current device
-'DOC:       Note that all device state is lost and that the caller
-'DOC:       will need to call ther RestoreDeviceObjects function
-'DOC:
-'-----------------------------------------------------------------------------
+'' D3DUtil_ResizeFullscreen
+'
+'  @param  hWnd        Device window
+'  @param  modeIndex   Index into Modes list
+'
+'  @remarks            D3DUtil_Init or D3DEnum_BuildAdapterList must have been called
+'                      prior to call D3DUtil_ResizeFullscreen
+'                      Use this method when moving from windowed mode to fullscreen
+'                      on the current device
+'                      Note that all device state is lost and that the caller
+'                      will need to call ther RestoreDeviceObjects function
+
 Function D3DUtil_ResizeFullscreen(hwnd As Long, modeIndex As Long) As Boolean
     On Local Error GoTo errOut
      
@@ -736,22 +795,19 @@ errOut:
 End Function
  
  
-'-----------------------------------------------------------------------------
-'DOC: D3DUtil_DefaultInitWindowed
-'DOC:   Used to intialzed D3DUtil device in a windowed mode
-'DOC  Params:
-'DOC:   iAdapter    DisplayAdapter ordinal
-'DOC:   hwnd        Display hwnd
-'DOC: Remarks:
-'DOC:
-'DOC:   Users can initialze the g_d3d and g_dev objects themselves
-'DOC:   and not use this function be sure to initialize
-'DOC:       g_iAdapter, g_devType,g_behaviorFlags,g_focushwnd,g_presentParams
-'DOC:
-'DOC:   This function defaults to using SOFTWARE_VERTEXPROCESSING
-'DOC:   and requires HAL 3d support
-'-----------------------------------------------------------------------------
- 
+'' D3DUtil_DefaultInitWindowed
+'  Used to intialzed D3DUtil device in a windowed mode
+'
+'  @param  iAdapter    DisplayAdapter ordinal
+'  @param  hwnd        Display hwnd
+
+'  @remarks            Users can initialze the g_d3d and g_dev objects themselves
+'                      and not use this function be sure to initialize
+'                      g_iAdapter, g_devType,g_behaviorFlags,g_focushwnd,g_presentParams
+'
+'                      This function defaults to using SOFTWARE_VERTEXPROCESSING
+'                      and requires HAL 3d support
+
 Public Function D3DUtil_DefaultInitWindowed(iAdapter As Long, hwnd As Long) As Boolean
     On Local Error GoTo errOut
      
@@ -794,24 +850,21 @@ errOut:
 End Function
  
  
-'-----------------------------------------------------------------------------
-'DOC: D3DUtil_DefaultInitFullscreen
-'DOC:   Used to intialzed D3DUtil device in a windowed mode
-'DOC  Params:
-'DOC:   iAdapter    DisplayAdapter ordinal
-'DOC:   hwnd        Display hwnd
-'DOC:   w           width
-'DOC    h           height
-'DOC    fmt         desired format
-'DOC: Remarks:
-'DOC:
-'DOC:   Users can initialze the g_d3d and g_dev objects themselves
-'DOC:   and not use this function be sure to initialize
-'DOC:       g_iAdapter, g_devType,g_behaviorFlags,g_focushwnd,g_presentParams
-'DOC:
-'DOC:   This function defaults to using SOFTWARE_VERTEXPROCESSING
-'DOC:   and requires HAL 3d support
-'-----------------------------------------------------------------------------
+'' D3DUtil_DefaultInitFullscreen
+'  Used to intialzed D3DUtil device in a windowed mode
+'
+'  @param  iAdapter    DisplayAdapter ordinal
+'  @param  hwnd        Display hwnd
+'  @param  w           Width
+'  @param  h           Height
+'  @param  fmt         Desired format
+'
+'  @remarks            Users can initialze the g_d3d and g_dev objects themselves
+'                      and not use this function be sure to initialize
+'                      g_iAdapter, g_devType,g_behaviorFlags,g_focushwnd,g_presentParams
+'
+'                      This function defaults to using SOFTWARE_VERTEXPROCESSING
+'                      and requires HAL 3d support
  
 Public Function D3DUtil_DefaultInitFullscreen(iAdapter As Long, hwnd As Long, w As Long, h As Long, fmt As CONST_D3DFORMAT) As Boolean
     On Local Error GoTo errOut
@@ -856,24 +909,190 @@ Public Function D3DUtil_DefaultInitFullscreen(iAdapter As Long, hwnd As Long, w 
 errOut:
 End Function
  
- 
- 
- 
- 
-'-----------------------------------------------------------------------------
-'DOC: D3DEnum_Cleanup
-'DOC:   Used to release any reference to the callback object passed in
-'DOC:   and deallocate memory
-'DOC: Params:
-'DOC:   none
-'DOC: Remarks:
-'DOC:   none
-'-----------------------------------------------------------------------------
+'' D3DEnum_Cleanup
+'  Used to release any reference to the callback object passed in and deallocate memory
+
 Public Sub D3DEnum_Cleanup()
     Set g_EnumCallback = Nothing
     ReDim g_Adapters(0)
 End Sub
+
+Public Sub D3DUtil_Destroy()
+
+    'Set no texture in the device to avoid memory leaks
+    If Not g_dev Is Nothing Then
+        g_dev.SetTexture 0, Nothing
+    End If
+
+    Set g_dx = Nothing
+    Set g_d3dx = Nothing
+    Set g_d3d = Nothing
+    Set g_dev = Nothing
+
+End Sub
+
+'------------------------------------------------------------------
+' Public Functions
+'------------------------------------------------------------------
  
+'-----------------------------------------------------------------------------
+'DOC: D3DUtil_SetupDefaultScene
+'DOC:
+'DOC: helper function that initializes some default lighting and render states
+'DOC:
+'DOC: remarks:
+'DOC:   sets defaults for
+'DOC:   g_fov, g_aspect, g_znear, g_zfar
+'DOC:   g_identityMatrix, g_projMatrix, g_ViewMatrix, g_worldMatrix
+'DOC:   set device state for project view and world matrices
+'DOC:   set device state for 2 directional lights (0 and 1)
+'DOC:   set device state for a default grey material
+'-----------------------------------------------------------------------------
+ 
+Public Sub D3DUtil_SetupDefaultScene()
+     
+    g_fov = g_pi / 4
+    g_aspect = 1
+    g_znear = 1
+    g_zfar = 3000
+     
+    If g_lWindowHeight <> 0 And g_lWindowWidth <> 0 Then g_aspect = g_lWindowHeight / g_lWindowWidth
+     
+    D3DXMatrixIdentity g_identityMatrix
+     
+    D3DXMatrixPerspectiveFovLH g_projMatrix, g_fov, g_aspect, g_znear, g_zfar
+     
+    g_dev.SetTransform D3DTS_PROJECTION, g_projMatrix
+     
+    D3DXMatrixLookAtLH g_viewMatrix, vec3(0, 0, -20), vec3(0, 0, 0), vec3(0, 1, 0)
+     
+    g_dev.SetTransform D3DTS_VIEW, g_viewMatrix
+                  
+    g_dev.SetTransform D3DTS_WORLD, g_identityMatrix
+     
+    'default light0
+     
+    light0.Ambient = ColorValue4(1, 0.1, 0.1, 0.1)
+    light0.diffuse = ColorValue4(1, 1, 1, 1)
+    light0.Type = D3DLIGHT_DIRECTIONAL
+    light0.Range = 10000
+    light0.Direction.X = -1
+    light0.Direction.Y = -1
+    light0.Direction.z = -1
+    D3DXVec3Normalize light0.Direction, light0.Direction
+    g_dev.SetLight 0, light0
+    g_dev.LightEnable 0, 1 'true
+     
+    'default light1
+     
+    light1.Ambient = ColorValue4(1, 0.3, 0.3, 0.3)
+    light1.diffuse = ColorValue4(1, 1, 1, 1)
+    light1.Type = D3DLIGHT_DIRECTIONAL
+    light1.Range = 10000
+    light1.Direction.X = 1
+    light1.Direction.Y = -1
+    light1.Direction.z = -1
+    D3DXVec3Normalize light1.Direction, light1.Direction
+    'g_dev.SetLight 1, light1
+    'g_dev.LightEnable 1, 1 'true
+         
+         
+    'set first material
+    Dim material0 As D3DMATERIAL8
+    material0.Ambient = ColorValue4(1, 0.2, 0.2, 0.2)
+    material0.diffuse = ColorValue4(1, 0.5, 0.5, 0.5)
+    material0.power = 10
+    g_dev.SetMaterial material0
+     
+    With g_dev
+        Call .SetRenderState(D3DRS_AMBIENT, &H10101010)
+        Call .SetRenderState(D3DRS_CLIPPING, 1)             'CLIPPING IS ON
+        Call .SetRenderState(D3DRS_LIGHTING, 1)             'LIGHTING IS ON
+        Call .SetRenderState(D3DRS_ZENABLE, 1)              'USE ZBUFFER
+        Call .SetRenderState(D3DRS_SHADEMODE, D3DSHADE_GOURAUD)
+         
+    End With
+     
+End Sub
+ 
+'-----------------------------------------------------------------------------
+'DOC: ColorValue4
+'DOC: Params
+'DOC:   a r g b   values valid between 0.0 and 1.0
+'DOC: Return Value
+'DOC:   a filled D3DCOLORVALUE type
+'-----------------------------------------------------------------------------
+Function ColorValue4(a As Single, r As Single, g As Single, b As Single) As D3DCOLORVALUE
+    Dim c As D3DCOLORVALUE
+    c.a = a
+    c.r = r
+    c.g = g
+    c.b = b
+    ColorValue4 = c
+End Function
+ 
+'-----------------------------------------------------------------------------
+'DOC: Vec2
+'DOC: Params
+'DOC:   x y z   vector values
+'DOC: Return Value
+'DOC:   a filled D3DVECTOR type
+'-----------------------------------------------------------------------------
+Function vec2(X As Single, Y As Single) As D3DVECTOR2
+    vec2.X = X
+    vec2.Y = Y
+End Function
+ 
+ 
+'-----------------------------------------------------------------------------
+'DOC: Vec3
+'DOC: Params
+'DOC:   x y z   vector values
+'DOC: Return Value
+'DOC:   a filled D3DVECTOR type
+'-----------------------------------------------------------------------------
+Function vec3(X As Single, Y As Single, z As Single) As D3DVECTOR
+    vec3.X = X
+    vec3.Y = Y
+    vec3.z = z
+End Function
+ 
+'-----------------------------------------------------------------------------
+'Name: FtoDW
+'
+'For calls that require that a single be packed into a long
+'(such as some calls to SetRenderState) this function will do just that
+'-----------------------------------------------------------------------------
+Function FtoDW(f As Single) As Long
+    Dim buf As D3DXBuffer
+    Dim l As Long
+    Set buf = g_d3dx.CreateBuffer(4)
+    g_d3dx.BufferSetData buf, 0, 4, 1, f
+    g_d3dx.BufferGetData buf, 0, 4, 1, l
+    FtoDW = l
+End Function
+Public Sub D3D_ResetRenderStates()
+    With g_dev
+        Call .SetVertexShader(D3DFVF_TLVERTEX)
+        Call .SetRenderState(D3DRS_LIGHTING, False)
+        Call .SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA)
+        Call .SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA)
+        Call .SetRenderState(D3DRS_ZENABLE, False)
+        Call .SetRenderState(D3DRS_ZWRITEENABLE, False)
+        Call .SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE)
+        Call .SetRenderState(D3DRS_SHADEMODE, D3DSHADE_FLAT)
+        Call .SetRenderState(D3DRS_FILLMODE, CONST_D3DFILLMODE.D3DFILL_SOLID)
+         
+        .SetTextureStageState 0, D3DTSS_COLORARG1, D3DTA_TEXTURE
+        .SetTextureStageState 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE
+        .SetTextureStageState 0, D3DTSS_COLOROP, D3DTOP_MODULATE
+        .SetTextureStageState 0, D3DTSS_ALPHAOP, D3DTOP_MODULATE
+     
+        Call .SetTextureStageState(0, D3DTSS_MINFILTER, D3DTEXF_LINEAR)
+        Call .SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTEXF_LINEAR)
+ 
+    End With
+End Sub
  
 '------------------------------------------------------------------
 'Private Functions
@@ -1090,3 +1309,4 @@ Private Function D3DEnum_CheckFormatCompatibility(lAdapter As Long, DeviceType A
 errOut:
  
 End Function
+

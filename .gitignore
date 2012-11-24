@@ -1,0 +1,32 @@
+# Ignore directories and files
+*.jpg
+*.png
+*.bmp
+*.db
+*.ini
+*.map
+*.pak
+*.mp3
+*.tmp
+*.exe
+*.dll
+
+# It's better to unpack these files and commit the raw source because
+# git has its own built in compression methods.
+*.7z
+*.rar
+*.zip
+
+# Windows ignore
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+packages/

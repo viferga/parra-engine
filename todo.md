@@ -1,4 +1,5 @@
 Client
+
 	- Render:
 		Implementar un batch render, para optimizar el renderizado.
 		Abstraer las llamadas al render de la libreria (DirectX).

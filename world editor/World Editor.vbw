@@ -1,0 +1,5 @@
+frmMain = 0, 0, 0, 0, C, 44, 44, 833, 522, C
+modGeneral = 22, 22, 811, 500, 
+modTileEngine = 0, 0, 0, 0, C
+modHelper = 0, 0, 0, 0, C
+modWorldEditor = 0, 0, 0, 0, C

@@ -8,7 +8,7 @@ Client
 		Implementar render y animación de sprites mediante huesos.
 		Implementar multitexturing en el terreno.
 		Implementar luces y sombras (más bonitas que lo que hay ahora por AO).
-		Normal mapping y bump mapping (este ultimo es algo lento así que ya veremos).
+		Normal mapping.
 		
 	- Graphic User Interface:
 		Eliminar formularios, crear una instancia de la ventana desde el main directamente.

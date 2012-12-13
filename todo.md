@@ -40,7 +40,5 @@ Server
 			
 	- Core:
 		Implementar la conexión sockets mediante api de windows (tengo las clases hechas).
-		Implementar una clase Thread, una clase Mutex y Condition (tengo las dos primeras hechas). Armar todo el servidor con hilos.
-		
-		
-		
+		Implementar una clase Thread, una clase Mutex y Condition (tengo las dos primeras hechas). Armar todo el servidor con hilos.	
+		Implementar nuevo protocolo

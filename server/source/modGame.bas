@@ -44,6 +44,8 @@ Private Sub gameMainLoop()
 End Sub
 Private Sub gameLoad()
 
+    InitializeRandom
+
     'Show Form
      frmMain.Show
     

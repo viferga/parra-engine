@@ -7,11 +7,6 @@ Public Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (destination 
 
 Private Declare Function writeprivateprofilestring Lib "kernel32" Alias "WritePrivateProfileStringA" (ByVal lpApplicationname As String, ByVal lpKeyname As Any, ByVal lpString As String, ByVal lpfilename As String) As Long
 Private Declare Function getprivateprofilestring Lib "kernel32" Alias "GetPrivateProfileStringA" (ByVal lpApplicationname As String, ByVal lpKeyname As Any, ByVal lpdefault As String, ByVal lpreturnedstring As String, ByVal nsize As Long, ByVal lpfilename As String) As Long
-<<<<<<< HEAD
-Public Sub InitializeRandom(): Randomize Timer: End Sub
-Public Function RandomNumber(ByVal LowerBound As Long, ByVal UpperBound As Long) As Long: RandomNumber = Fix(Rnd * (UpperBound - LowerBound + 1)) + LowerBound: End Function
-=======
->>>>>>> aac1b8d4e26c0e3599dc1775514161391d893b54
 Public Function FileExist(ByVal file As String, Optional FileType As VbFileAttribute = vbNormal) As Boolean: FileExist = LenB(Dir$(file, FileType)) <> 0: End Function
 Public Sub WriteVar(ByVal file As String, ByVal Main As String, ByVal Var As String, ByVal Value As String): writeprivateprofilestring Main, Var, Value, file: End Sub
 Public Function GetVar(ByVal file As String, ByVal Main As String, ByVal Var As String) As String
@@ -48,7 +43,6 @@ Public Sub Consola(ByRef Text As String)
     frmMain.Consola.AddItem Text
 
 End Sub
-
 Public Sub IntializeRandom()
     Randomize Timer
 End Sub

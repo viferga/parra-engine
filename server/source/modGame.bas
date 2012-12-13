@@ -44,7 +44,8 @@ Private Sub gameMainLoop()
 End Sub
 Private Sub gameLoad()
 
-    InitializeRandom
+    'Init the Randomize Timer
+    IntializeRandom
 
     'Show Form
      frmMain.Show
@@ -111,9 +112,6 @@ Public Sub Main()
         MsgBox "El servidor ya está abierto."
         End
     End If
-    
-    'Init the "Randomize Timer"
-    IntializeRandom
     
     'Load Game
     gameLoad

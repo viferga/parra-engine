@@ -106,11 +106,14 @@ Public Sub gameUnLoad()
     
 End Sub
 Public Sub Main()
-
+    
     If (App.PrevInstance) Then
         MsgBox "El servidor ya está abierto."
         End
     End If
+    
+    'Init the "Randomize Timer"
+    IntializeRandom
     
     'Load Game
     gameLoad

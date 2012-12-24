@@ -3,7 +3,7 @@ Option Explicit
 
 Public WireFrame As Boolean
 
-Private Color(1) As D3DCOLORVALUE
+Public Color(1) As D3DCOLORVALUE
 
 Public Const EngineWidth As Integer = 800
 Public Const EngineHeight As Integer = 600
@@ -89,7 +89,7 @@ End Type
 Public characterList() As Character
 Public charLast As Integer
 
-Private ScrollPixelsPerFrame As structPositionInt
+Public ScrollPixelsPerFrame As structPositionInt
 
 Public UserMoving As Byte
 Public UserPos As structPositionInt
@@ -103,16 +103,6 @@ Public RenderRect As D3DRECT
 Public FramesPerSec As Integer
 Public FramesPerSecCounter  As Long
 
-' DirectX8 & Extras
-Dim D3DWindow As DxVBLibA.D3DPRESENT_PARAMETERS
-Dim DispMode As DxVBLibA.D3DDISPLAYMODE
-Dim DevCaps As DxVBLibA.D3DCAPS8
-
-Public DX As DxVBLibA.DirectX8 'Root object
-Public D3D As DxVBLibA.Direct3D8 ' Direct3D interface
-Public D3DX As DxVBLibA.D3DX8 ' Helper library
-Public D3DDevice As DxVBLibA.Direct3DDevice8 'Represents the hardware doing the rendering
-
 ' Directx8 Fonts
 Private Type FontInfo
     MainFont As DxVBLibA.D3DXFont
@@ -122,27 +112,27 @@ Private Type FontInfo
 End Type: Private Font() As FontInfo
 
 ' Vector Usado para los Quads
-Dim Vector(3) As D3DTLVERTEX
+Public Vector(3) As D3DTLVERTEX
 
 ' INDEX BUFFERS
-Dim vbQuadIdx As DxVBLibA.Direct3DVertexBuffer8
-Dim ibQuad As DxVBLibA.Direct3DIndexBuffer8
-Dim indexList(0 To 5) As Integer 'the 6 indices required (note that the number is the
+Public vbQuadIdx As DxVBLibA.Direct3DVertexBuffer8
+Public ibQuad As DxVBLibA.Direct3DIndexBuffer8
+Public indexList(0 To 5) As Integer 'the 6 indices required (note that the number is the
                               'same as the vertex count in the previous version).
 'for motion blurring
-Dim m_pDisplayTexture As DxVBLibA.Direct3DTexture8
-Dim m_pDisplayTextureSurface As DxVBLibA.Direct3DSurface8
-Dim m_pDisplayZSurface As DxVBLibA.Direct3DSurface8
-Dim m_pBackBuffer As DxVBLibA.Direct3DSurface8
-Dim m_pZBuffer As DxVBLibA.Direct3DSurface8
+Public m_pDisplayTexture As DxVBLibA.Direct3DTexture8
+Public m_pDisplayTextureSurface As DxVBLibA.Direct3DSurface8
+Public m_pDisplayZSurface As DxVBLibA.Direct3DSurface8
+Public m_pBackBuffer As DxVBLibA.Direct3DSurface8
+Public m_pZBuffer As DxVBLibA.Direct3DSurface8
 
-Dim VertList(0 To 3) As D3DTLVERTEX
+Public VertList(0 To 3) As D3DTLVERTEX
 
 Public errMotion     As Boolean
 Public MotionBlur    As Boolean
 Public lBlurFactor   As Byte
 
-Dim BasicColor(3) As Long
+Public BasicColor(3) As Long
 
 ' ElapsedTime
 Dim timerElapsedTime As Single
@@ -158,7 +148,7 @@ Public Declare Function GetTickCount Lib "kernel32" () As Long
 'Very percise counter 64bit system counter
 Public Declare Function QueryPerformanceFrequency Lib "kernel32" (lpFrequency As Currency) As Long
 Public Declare Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCount As Currency) As Long
-Private Sub initializeIndex()
+Public Sub initializeIndex()
     Dim i As Long
     
       ReDim Preserve Grh(1 To GetVar(App.Path & "\Init\grh.ini", "INIT", "numGrh")) As structGrhData
@@ -392,9 +382,7 @@ On Error GoTo errHandle
         SetWindowPos frmConnect.hwnd, 0, 0, 0, 800, 600, 0
     End If
     
-    Set DX = New DirectX8
-    Set D3D = DX.Direct3DCreate
-    Set D3DX = New D3DX8
+
         
     With RenderRect
         .Y1 = Top
@@ -555,7 +543,7 @@ errHandle:
 
 End Function
 
-Private Function initializeMotionBlur() As Boolean
+Public Function initializeMotionBlur() As Boolean
 
 On Error GoTo errHandle
 
@@ -602,7 +590,7 @@ errHandle:
     errMotion = True
 
 End Function
-Private Sub deviceResetRenderStates()
+Public Sub deviceResetRenderStates()
 
     With D3DDevice
     
@@ -695,49 +683,8 @@ Private Sub ResetMotionStates()
             
         End With
 End Sub
-Public Sub engineDeinitializing()
 
-    guiDestroy
-
-    If cPixelShader > 0 Then D3DDevice.SetPixelShader 0
-    pixelShaderDelete cPixelShader
-
-    Erase indexList
-    Erase Vector
-    
-    'Index Buffers
-    Set vbQuadIdx = Nothing
-    Set ibQuad = Nothing
-
-    MotionBlur = False
-
-    Set m_pDisplayTexture = Nothing
-    Set m_pDisplayZSurface = Nothing
-    Set m_pBackBuffer = Nothing
-    Set m_pZBuffer = Nothing
-    Set m_pDisplayTextureSurface = Nothing
-
-    'Destroy all textures
-    #If LoadingMetod = 0 Then
-        texDestroyAll
-    #Else
-        surfaceTerminate
-    #End If
-    
-    'Set no texture in the device to avoid memory leaks
-    If Not D3DDevice Is Nothing Then
-        D3DDevice.SetTexture 0, Nothing
-    End If
-    
-    fontDeInitializing
-
-    Set DX = Nothing
-    Set D3D = Nothing
-    Set D3DX = Nothing
-    Set D3DDevice = Nothing
-        
-End Sub
-Private Function fontInitializing(ByRef Size As Byte) As Boolean
+Public Function fontInitializing(ByRef Size As Byte) As Boolean
     Dim i As Byte
     
     ReDim Preserve Font(1 To Size) As FontInfo
@@ -758,7 +705,7 @@ Private Function fontInitializing(ByRef Size As Byte) As Boolean
     Next i
     
 End Function
-Private Sub fontDeInitializing()
+Public Sub fontDeInitializing()
     Dim i As Byte
     
     For i = 1 To UBound(Font)

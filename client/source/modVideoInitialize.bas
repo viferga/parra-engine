@@ -362,7 +362,8 @@ Function D3DUtil_InitWindowed(hwnd As Long, AdapterIndex As Long, DevType As CON
         ' figure out if this format supports hardware acceleration
         ' by looking it up in our format list
         g_behaviorflags = D3DEnum_FindInFormatList(g_lCurrentAdapter, DevType, d3ddm.Format)
-        If g_behaviorflags <= 0 Then g_behaviorflags = D3DCREATE_SOFTWARE_VERTEXPROCESSING
+        If g_behaviorflags <= 0 Then g_behaviorflags = D3DEnum_CheckFormatCompatibility(AdapterIndex, DevType, d3ddm.Format, False, False)
+
         
         
         D3DWindow.BackBufferFormat = d3ddm.Format
@@ -521,8 +522,7 @@ Function D3DUtil_InitFullscreen(hwnd As Long, AdapterIndex As Long, modeIndex As
         .bWindowed = False
         .DeviceType = DevType
         
-        
-        If g_behaviorflags = 0 Then g_behaviorflags = D3DCREATE_SOFTWARE_VERTEXPROCESSING
+        If g_behaviorflags <= 0 Then g_behaviorflags = D3DEnum_CheckFormatCompatibility(AdapterIndex, DevType, ModeInfo.Format, False, False)
         D3DDeviceType = DevType
         
     End With

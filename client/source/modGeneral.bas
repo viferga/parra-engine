@@ -23,7 +23,7 @@ End Type
 Private Declare Function GetCursorPos Lib "user32" (lpPoint As PointAPI) As Long
 Private Declare Function GetActiveWindow Lib "user32" () As Long
 Public Declare Function SetWindowPos Lib "user32" (ByVal hwnd As Long, ByVal hWndInsertAfter As Long, ByVal X As Long, ByVal Y As Long, ByVal cX As Long, ByVal cY As Long, ByVal wFlags As Long) As Long
-Sub main()
+Sub Main()
 
     IntializeRandom
 
@@ -41,7 +41,7 @@ Sub main()
     gamePaused = True
     
     'bRunning is true if TileEninge initialize correctly
-    bRunning = D3DUtil_Init(frmMain.hwnd, False, 0, 0, D3DDEVTYPE_HAL, frmMain)  'engineInitializing(0, 0, 800, 600, frmMain, 16, True) '553
+    bRunning = D3DUtil_Init(frmMain.hwnd, True, 0, 0, D3DDEVTYPE_HAL, frmMain)  'engineInitializing(0, 0, 800, 600, frmMain, 16, True) '553
     
     'Load MapData
     mapLoadAll

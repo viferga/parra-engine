@@ -41,7 +41,7 @@ Sub Main()
     gamePaused = True
     
     'bRunning is true if TileEninge initialize correctly
-    bRunning = D3DUtil_Init(frmMain.hwnd, True, 0, 0, D3DDEVTYPE_HAL, frmMain)  'engineInitializing(0, 0, 800, 600, frmMain, 16, True) '553
+    bRunning = engineInitializing(0, 0, 800, 600, frmMain, 16, True)   '553
     
     'Load MapData
     mapLoadAll
@@ -64,8 +64,7 @@ Sub Main()
     mapUnloadAll
     
     'Deinit engine
-    'engineDeinitializing
-    D3DUtil_Destory
+    engineDeinitializing
     
     'Stop Audio
     Sound_Destroy

@@ -34,8 +34,8 @@ Private Const MAX_DISTANCE_TO_SOURCE As Integer = 150
 Private Type SoundBuffer
     FileName As String
     Looping As Boolean
-    X As Byte
-    Y As Byte
+    x As Byte
+    y As Byte
     normalFq As Long
     Buffer As clsLoaderMP3
 End Type
@@ -93,8 +93,8 @@ On Error GoTo ErrHandler
         End If
 
         'Store position
-        .X = srcX
-        .Y = srcY
+        .x = srcX
+        .y = srcY
 
     End With
 
@@ -118,8 +118,8 @@ Private Sub Sound_Update3D(ByVal BufferIndex As Long, ByVal deltaX As Integer, B
     Dim distanceYNew As Integer
    
     With SoundBuffers(BufferIndex)
-        distanceXOld = .X - lastPosX
-        distanceYOld = .Y - lastPosY
+        distanceXOld = .x - lastPosX
+        distanceYOld = .y - lastPosY
        
         distanceXNew = distanceXOld + deltaX
         distanceYNew = distanceYOld + deltaY
@@ -143,26 +143,26 @@ End Sub
 ''
 ' Updates 3D sounds based on the movement of the listener.
  
-Public Sub Sound_MoveListener(ByVal X As Integer, ByVal Y As Integer)
+Public Sub Sound_MoveListener(ByVal x As Integer, ByVal y As Integer)
     Dim i As Long
     Dim deltaX As Integer
     Dim deltaY As Integer
    
-    deltaX = X - lastPosX
-    deltaY = Y - lastPosY
+    deltaX = x - lastPosX
+    deltaY = y - lastPosY
    
     For i = 1 To BufferSize
         If Not SoundBuffers(i).Buffer Is Nothing Then
             If SoundBuffers(i).Buffer.Status = 1 Then
-                If SoundBuffers(i).X <> 0 And SoundBuffers(i).Y <> 0 Then
+                If SoundBuffers(i).x <> 0 And SoundBuffers(i).y <> 0 Then
                     Call Sound_Update3D(i, deltaX, deltaY)
                 End If
             End If
         End If
     Next i
    
-    lastPosX = X
-    lastPosY = Y
+    lastPosX = x
+    lastPosY = y
 End Sub
 
 Private Function Sound_Load(ByVal FileName As String, ByVal Looping As LoopStyle) As Long
@@ -277,7 +277,7 @@ End Function
 ''
 ' Creates and configures all DirectMusic objects.
 
-Private Function Music_Initialize(ByRef DirectX As DirectX8, ByVal hwnd As Long) As Boolean
+Private Function Music_Initialize(ByRef DirectX As DirectX8, ByVal hwnd As Long) As Boolean 'GDK: hay que usar esto jaja
 On Error GoTo ErrHandler
     
     Dim musParams As DMUS_AUDIOPARAMS

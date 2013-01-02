@@ -16,14 +16,14 @@ Private Declare Function GetKeyState Lib "user32" (ByVal nVirtKey As Long) As Lo
 
 'MouseInput
 Private Type PointAPI
-    X As Long
-    Y As Long
+    x As Long
+    y As Long
 End Type
 
-Private Declare Function GetCursorPos Lib "user32" (lpPoint As PointAPI) As Long
+'Private Declare Function GetCursorPos Lib "user32" (lpPoint As PointAPI) As Long
 Private Declare Function GetActiveWindow Lib "user32" () As Long
-Public Declare Function SetWindowPos Lib "user32" (ByVal hwnd As Long, ByVal hWndInsertAfter As Long, ByVal X As Long, ByVal Y As Long, ByVal cX As Long, ByVal cY As Long, ByVal wFlags As Long) As Long
-Sub Main()
+Public Declare Function SetWindowPos Lib "user32" (ByVal hwnd As Long, ByVal hWndInsertAfter As Long, ByVal x As Long, ByVal y As Long, ByVal cx As Long, ByVal cy As Long, ByVal wFlags As Long) As Long
+Sub main()
 
     IntializeRandom
 

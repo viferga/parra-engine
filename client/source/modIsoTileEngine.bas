@@ -97,7 +97,7 @@ Public AddtoUserPos As structPositionInt
 Public playerCharIndex As Integer
 
 'Quad Draw
-Public RenderRect As D3DRECT
+Public RenderRect As RECT
 
 'FPS Count
 Public FramesPerSec As Integer
@@ -120,6 +120,8 @@ Private g_EnumCallback As Object                 ' object that defines VerifyDev
 
 Private g_behaviorflags As Long                  ' Current VertexProcessing (hardware or software)
 Private g_focushwnd As Long                      ' Current focus window handle
+Private g_lWindowWidth As Long                   ' backbuffer width of windowed state
+Private g_lWindowHeight As Long                   ' backbuffer height of windowed state
 
 Private D3DDeviceType As CONST_D3DDEVTYPE
 
@@ -169,6 +171,12 @@ Public Declare Function GetTickCount Lib "kernel32" () As Long
 Public Declare Function QueryPerformanceFrequency Lib "kernel32" (lpFrequency As Currency) As Long
 Public Declare Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCount As Currency) As Long
 
+Private Declare Function GetWindowRect Lib "user32.dll" (ByVal hwnd As Long, ByRef RECT As RECT) As Long
+Private Declare Function GetClientRect Lib "user32.dll" (ByVal hwnd As Long, ByRef RECT As RECT) As Long
+Private Declare Function SetWindowPos Lib "user32.dll" (ByVal hwnd As Long, ByVal hwndafter As Long, ByVal x As Long, ByVal y As Long, ByVal cx As Long, ByVal cy As Long, ByVal options As Long) As Long
+'Private Declare Function SetWindowLongA Lib "user32.dll" (ByVal hwnd As Long, ByVal nIndex As Long, ByVal newVal As Long) As Long
+'Private Declare Function GetWindowLongA Lib "user32.dll" (ByVal hwnd As Long, ByVal nIndex As Long) As Long
+
 Public Sub initializeIndex()
     Dim i As Long
     
@@ -215,6 +223,7 @@ Public Sub initializeIndex()
     
 End Sub
 Private Sub initializeGrhAnim(ByRef cGrh As structGrh, ByVal GrhIndex As Integer, Optional ByVal Started As Byte = 2)
+'GDK: sin uso
 
     cGrh.GrhIndex = GrhIndex
     
@@ -252,21 +261,21 @@ Public Sub showNextFrame()
     If UserMoving Then
     
     '****** Move screen Left and Right if needed ******
-        If AddtoUserPos.X <> 0 Then
-            OffsetCounter.X = OffsetCounter.X - ScrollPixelsPerFrame.X * AddtoUserPos.X * timerTicksPerFrame
-            If Abs(OffsetCounter.X) >= Abs(TilePixelWidth * AddtoUserPos.X) Then
-                OffsetCounter.X = 0
-                AddtoUserPos.X = 0
+        If AddtoUserPos.x <> 0 Then
+            OffsetCounter.x = OffsetCounter.x - ScrollPixelsPerFrame.x * AddtoUserPos.x * timerTicksPerFrame
+            If Abs(OffsetCounter.x) >= Abs(TilePixelWidth * AddtoUserPos.x) Then
+                OffsetCounter.x = 0
+                AddtoUserPos.x = 0
                 UserMoving = False
             End If
         End If
                     
     '****** Move screen Up and Down if needed ******
-        If AddtoUserPos.Y <> 0 Then
-            OffsetCounter.Y = OffsetCounter.Y - ScrollPixelsPerFrame.Y * AddtoUserPos.Y * timerTicksPerFrame
-            If Abs(OffsetCounter.Y) >= Abs(TilePixelHeight * AddtoUserPos.Y) Then
-                OffsetCounter.Y = 0
-                AddtoUserPos.Y = 0
+        If AddtoUserPos.y <> 0 Then
+            OffsetCounter.y = OffsetCounter.y - ScrollPixelsPerFrame.y * AddtoUserPos.y * timerTicksPerFrame
+            If Abs(OffsetCounter.y) >= Abs(TilePixelHeight * AddtoUserPos.y) Then
+                OffsetCounter.y = 0
+                AddtoUserPos.y = 0
                 UserMoving = False
             End If
         End If
@@ -297,7 +306,7 @@ Public Sub showNextFrame()
                'Render Map
                 mapRender OffsetCounter
 
-                fontRender CStr("X: " & CStr(UserPos.X) & " Y: " & CStr(UserPos.Y)), 2, 300, 0, 130, 20, DT_LEFT
+                fontRender CStr("X: " & CStr(UserPos.x) & " Y: " & CStr(UserPos.y)), 2, 300, 0, 130, 20, DT_LEFT
             
             #If ParticleEditor = 1 Then
                 End If
@@ -307,11 +316,11 @@ Public Sub showNextFrame()
                 
                 #If WorldEditor = 1 Then
                     If EditMap = True Then
-                        fontRender CStr("MouseX: " & CStr(MouseTilesPos.X) & " MouseY: " & CStr(MouseTilesPos.Y)), 2, 560, 1, 240, 20, DT_LEFT
+                        fontRender CStr("MouseX: " & CStr(MouseTilesPos.x) & " MouseY: " & CStr(MouseTilesPos.y)), 2, 560, 1, 240, 20, DT_LEFT
                         
                         'Render grhSelected
                         If frmMain.grhList.ListIndex + 1 > 0 Then
-                            deviceRenderTexture frmMain.grhList.ListIndex + 1, Mouse.X, Mouse.Y, BasicColor(), frmMain.cmbMode.ListIndex
+                            deviceRenderTexture frmMain.grhList.ListIndex + 1, Mouse.x, Mouse.y, BasicColor(), frmMain.cmbMode.ListIndex
                         End If
                     End If
                 #End If
@@ -414,12 +423,12 @@ On Error GoTo errHandle
         SetWindowPos frmConnect.hwnd, 0, 0, 0, 800, 600, 0
     End If
         
-    With RenderRect
-        .Y1 = Top
-        .X1 = Left
-        .X2 = Width
-        .Y2 = Height
-    End With
+    'With RenderRect
+    '    .Y1 = Top
+    '    .X1 = Left
+    '    .X2 = Width
+    '    .Y2 = Height
+    'End With
 
     '*******************************
     'Initialize video device
@@ -555,8 +564,8 @@ On Error GoTo errHandle
     Color(1).r = 250: Color(1).g = 250: Color(1).b = 200
     
     'Pixelsperframe for tile engine
-    ScrollPixelsPerFrame.X = 8
-    ScrollPixelsPerFrame.Y = 8
+    ScrollPixelsPerFrame.x = 8
+    ScrollPixelsPerFrame.y = 8
     
     'Create a pixel shader
     cPixelShader = pixelShaderMakeFromMemory(psOriginalColor)
@@ -602,11 +611,11 @@ Private Function engineInitializingInWindow(hwnd As Long, AdapterIndex As Long, 
         
     g_focushwnd = hwnd
     
-    'Dim rc As D3DRECT
-    'Call GetClientRect(g_focushwnd, rc)
-    'RenderRect.X2 = rc.Right - rc.Left
-    'RenderRect.Y2 = rc.Bottom - rc.Top
-    'Call GetWindowRect(g_focushwnd, RenderRect)
+    Dim rc As RECT
+    Call GetClientRect(g_focushwnd, rc)
+    RenderRect.Right = rc.Right - rc.Left
+    RenderRect.Bottom = rc.Bottom - rc.Top
+    Call GetWindowRect(g_focushwnd, RenderRect)
     
     
     With g_Adapters(g_lCurrentAdapter)
@@ -713,10 +722,10 @@ Private Function engineInitializingInFullscreen(hwnd As Long, AdapterIndex As Lo
     
     'switching from windowed to fullscreen so save height and width
     If D3DWindow.Windowed = 1 Then
-        'Call GetClientRect(g_focushwnd, rc)
-        'g_lWindowWidth = rc.Right - rc.Left
-        'g_lWindowHeight = rc.Bottom - rc.Top
-        'Call GetWindowRect(g_focushwnd, RenderRect)
+        Call GetClientRect(g_focushwnd, rc)
+        g_lWindowWidth = rc.Right - rc.Left
+        g_lWindowHeight = rc.Bottom - rc.Top
+        Call GetWindowRect(g_focushwnd, RenderRect)
     End If
 
     
@@ -826,7 +835,7 @@ End Function
 
 Public Sub engineDeinitializing()
     Dim emptycaps As D3DCAPS8
-    Dim emptyrect As D3DRECT
+    Dim emptyrect As RECT
     Dim emptypresent As D3DPRESENT_PARAMETERS
     
     guiDestroy
@@ -874,7 +883,9 @@ Public Sub engineDeinitializing()
     
     g_focushwnd = 0
     g_behaviorflags = 0
-    
+    g_lWindowWidth = 0
+    g_lWindowHeight = 0
+   
     DevCaps = emptycaps
     D3DWindow = emptypresent
     RenderRect = emptyrect
@@ -900,9 +911,9 @@ On Error GoTo errHandle
     Set m_pDisplayTextureSurface = m_pDisplayTexture.GetSurfaceLevel(0)
     
     VertList(0).sX = -1: VertList(0).sY = -1
-    VertList(1).sX = RenderRect.X2: VertList(1).sY = -1
-    VertList(2).sX = -1: VertList(2).sY = RenderRect.Y2
-    VertList(3).sX = RenderRect.X2: VertList(3).sY = RenderRect.Y2
+    VertList(1).sX = RenderRect.Right: VertList(1).sY = -1
+    VertList(2).sX = -1: VertList(2).sY = RenderRect.Bottom
+    VertList(3).sX = RenderRect.Right: VertList(3).sY = RenderRect.Bottom
     
     VertList(0).rhw = 1: VertList(1).rhw = 1: VertList(2).rhw = 1: VertList(3).rhw = 1
     
@@ -914,9 +925,9 @@ On Error GoTo errHandle
     
     'we need to adjust texcoords to factor in that we're not using ALL of the texture
     VertList(0).tu = 0#: VertList(0).tv = 0#
-    VertList(1).tu = RenderRect.X2 / TexSizeW: VertList(1).tv = 0#
-    VertList(2).tu = 0#: VertList(2).tv = RenderRect.Y2 / TexSizeH
-    VertList(3).tu = RenderRect.X2 / TexSizeW: VertList(3).tv = RenderRect.Y2 / TexSizeH
+    VertList(1).tu = RenderRect.Right / TexSizeW: VertList(1).tv = 0#
+    VertList(2).tu = 0#: VertList(2).tv = RenderRect.Bottom / TexSizeH
+    VertList(3).tu = RenderRect.Right / TexSizeW: VertList(3).tv = RenderRect.Bottom / TexSizeH
     
     lBlurFactor = 10
     
@@ -1057,49 +1068,49 @@ Public Sub fontDeInitializing()
     
 End Sub
 Private Sub fontRender(ByRef Text As String, ByRef Index As Byte, _
-                            ByRef X As Integer, ByRef Y As Integer, _
+                            ByRef x As Integer, ByRef y As Integer, _
                             ByRef Width As Integer, ByRef Height As Integer, _
                             Format As Long)
                             
     Static fontRect As RECT 'This defines where it will be
     
     With fontRect
-        .Top = Y + RenderRect.Y1
-        .Left = X + RenderRect.X1
-        .Bottom = Y + Height + RenderRect.Y1
-        .Right = X + Width + RenderRect.X1
+        .Top = y + RenderRect.Top
+        .Left = x + RenderRect.Left
+        .Bottom = y + Height + RenderRect.Top
+        .Right = x + Width + RenderRect.Left
     End With
     
     D3DX.DrawText Font(Index).MainFont, Font(Index).Color, Text, fontRect, Format
 End Sub
 Public Sub Move(ByVal Direction As eDirection)
     
-    Dim X As Integer
-    Dim Y As Integer
+    Dim x As Integer
+    Dim y As Integer
     
     'Figure out which way to move
     Select Case Direction
-        Case eDirection.NorthEast: Y = -1: X = 1
+        Case eDirection.NorthEast: y = -1: x = 1
         
-        Case eDirection.NorthWest: Y = -1: X = -1
+        Case eDirection.NorthWest: y = -1: x = -1
         
-        Case eDirection.SouthEast: Y = 1: X = 1
+        Case eDirection.SouthEast: y = 1: x = 1
         
-        Case eDirection.SouthWest: Y = 1: X = -1
+        Case eDirection.SouthWest: y = 1: x = -1
         
-        Case eDirection.North: Y = -1: X = 0
+        Case eDirection.North: y = -1: x = 0
         
-        Case eDirection.South: Y = 1: X = 0
+        Case eDirection.South: y = 1: x = 0
         
-        Case eDirection.East: Y = 0: X = 1
+        Case eDirection.East: y = 0: x = 1
         
-        Case eDirection.West: Y = 0: X = -1
+        Case eDirection.West: y = 0: x = -1
         
     End Select
     
     Dim PositionOk As Boolean
     
-    PositionOk = mapLegalPos(UserPos.X + X, UserPos.Y + Y)
+    PositionOk = mapLegalPos(UserPos.x + x, UserPos.y + y)
     
     If PositionOk Then 'and usernot paralizate, etc..
         MoveChar playerCharIndex, Direction
@@ -1114,11 +1125,11 @@ End Sub
 Private Sub MoveChar(ByRef characterIndex As Integer, Direction As eDirection)
 
     Dim addX As Integer, addY As Integer
-    Dim X As Integer, Y As Integer
+    Dim x As Integer, y As Integer
     
     With characterList(characterIndex)
-        X = .Pos.X
-        Y = .Pos.Y
+        x = .Pos.x
+        y = .Pos.y
         
         'Figure out which way to move
         Select Case Direction
@@ -1157,72 +1168,72 @@ Private Sub MoveChar(ByRef characterIndex As Integer, Direction As eDirection)
                 
         End Select
         
-        mapData(X + addX, Y + addY).CharIndex = characterIndex
-        .Pos.X = X + addX
-        .Pos.Y = Y + addY
-        mapData(X, Y).CharIndex = 0
+        mapData(x + addX, y + addY).CharIndex = characterIndex
+        .Pos.x = x + addX
+        .Pos.y = y + addY
+        mapData(x, y).CharIndex = 0
         
-        .MoveOffset.X = -1 * (TilePixelWidth * addX)
-        .MoveOffset.Y = -1 * (TilePixelHeight * addY)
+        .MoveOffset.x = -1 * (TilePixelWidth * addX)
+        .MoveOffset.y = -1 * (TilePixelHeight * addY)
         
         .Moving = 1
         .Heading = Direction
         
-        .scrollDirection.X = addX
-        .scrollDirection.Y = addY
+        .scrollDirection.x = addX
+        .scrollDirection.y = addY
     End With
     
     'If uStats.Estado <> 1 Then Call DoPasosFx(CharIndex)
     
     'areas viejos
     
-    If mapInBounds(X + addX, Y + addY) = False Then
+    If mapInBounds(x + addX, y + addY) = False Then
         'charactererase characterIndex
     End If
 
 End Sub
 Private Sub MoveScreen(Direction As eDirection)
     
-    Dim X As Integer
-    Dim Y As Integer
+    Dim x As Integer
+    Dim y As Integer
     Dim tX As Integer
     Dim tY As Integer
     
     'Figure out which way to move
         Select Case Direction
         
-            Case eDirection.NorthEast: Y = -1: X = 1
+            Case eDirection.NorthEast: y = -1: x = 1
             
-            Case eDirection.NorthWest: Y = -1: X = -1
+            Case eDirection.NorthWest: y = -1: x = -1
             
-            Case eDirection.SouthEast: Y = 1: X = 1
+            Case eDirection.SouthEast: y = 1: x = 1
             
-            Case eDirection.SouthWest: Y = 1: X = -1
+            Case eDirection.SouthWest: y = 1: x = -1
             
-            Case eDirection.North: Y = -1: X = 0
+            Case eDirection.North: y = -1: x = 0
             
-            Case eDirection.South: Y = 1: X = 0
+            Case eDirection.South: y = 1: x = 0
             
-            Case eDirection.East: Y = 0: X = 1
+            Case eDirection.East: y = 0: x = 1
             
-            Case eDirection.West: Y = 0: X = -1
+            Case eDirection.West: y = 0: x = -1
     
                 
         End Select
     
     'Fill temp pos
-    tX = UserPos.X + X
-    tY = UserPos.Y + Y
+    tX = UserPos.x + x
+    tY = UserPos.y + y
     
     'Check to see if its out of bounds
     If mapInBounds(tX, tY) = False Then
         Exit Sub
     Else
         'Start moving... MainLoop does the rest
-        AddtoUserPos.X = X
-        AddtoUserPos.Y = Y
-        UserPos.X = tX
-        UserPos.Y = tY
+        AddtoUserPos.x = x
+        AddtoUserPos.y = y
+        UserPos.x = tX
+        UserPos.y = tY
         UserMoving = 1
     End If
 End Sub
@@ -1234,27 +1245,27 @@ Private Sub mapRender(ByRef PixelOffset As structPositionSng)
         Dim tempX As Single, tempY As Single ' temp position
         Dim offX As Single, offY As Single ' temp offset
         
-        If PixelOffset.X <> 0 Then
-            If PixelOffset.X < 0 Then
-                offX = 64 + PixelOffset.X
+        If PixelOffset.x <> 0 Then
+            If PixelOffset.x < 0 Then
+                offX = 64 + PixelOffset.x
             Else
-                offX = -64 + PixelOffset.X
+                offX = -64 + PixelOffset.x
             End If
         End If
         
-        If PixelOffset.Y <> 0 Then
-            If PixelOffset.Y < 0 Then
-                offY = 64 + PixelOffset.Y
+        If PixelOffset.y <> 0 Then
+            If PixelOffset.y < 0 Then
+                offY = 64 + PixelOffset.y
             Else
-                offY = -64 + PixelOffset.Y
+                offY = -64 + PixelOffset.y
             End If
         End If
         
         
         ' Controla el tamaño de tX & tY
         
-        tX = UserPos.X
-        tY = UserPos.Y
+        tX = UserPos.x
+        tY = UserPos.y
         
         If tY - TileBufferSize < 1 Then
             tY = 1 + TileBufferSize
@@ -1296,27 +1307,27 @@ Private Sub mapRender(ByRef PixelOffset As structPositionSng)
         
         ' Controla el mouseTilePos
         
-        MouseTilesPos.X = (UserPos.X * 64 + Mouse.X) \ TilePixelWidth
-        MouseTilesPos.Y = (UserPos.Y * 64 + Mouse.Y) \ TilePixelHeight
+        MouseTilesPos.x = (UserPos.x * 64 + Mouse.x) \ TilePixelWidth
+        MouseTilesPos.y = (UserPos.y * 64 + Mouse.y) \ TilePixelHeight
         
-        If MouseTilesPos.X < 1 Then
-            MouseTilesPos.X = 1
+        If MouseTilesPos.x < 1 Then
+            MouseTilesPos.x = 1
         End If
         
-        If MouseTilesPos.Y < 1 Then
-            MouseTilesPos.Y = 1
+        If MouseTilesPos.y < 1 Then
+            MouseTilesPos.y = 1
         End If
         
-        If MouseTilesPos.X > MaxTilesX Then
-            MouseTilesPos.X = MaxTilesX
+        If MouseTilesPos.x > MaxTilesX Then
+            MouseTilesPos.x = MaxTilesX
         End If
         
-        If MouseTilesPos.Y > MaxTilesY Then
-            MouseTilesPos.Y = MaxTilesY
+        If MouseTilesPos.y > MaxTilesY Then
+            MouseTilesPos.y = MaxTilesY
         End If
         
-        MousePosOnMap.X = mapPreCalcPos(MouseTilesPos.X, MouseTilesPos.Y).X
-        MousePosOnMap.Y = mapPreCalcPos(MouseTilesPos.X, MouseTilesPos.Y).Y
+        MousePosOnMap.x = mapPreCalcPos(MouseTilesPos.x, MouseTilesPos.y).x
+        MousePosOnMap.y = mapPreCalcPos(MouseTilesPos.x, MouseTilesPos.y).y
         
     Static LastCount As Long
     
@@ -1325,13 +1336,13 @@ Private Sub mapRender(ByRef PixelOffset As structPositionSng)
         For lY = tY - TileBufferSize To tY2 + TileBufferSize
             For lX = tX - TileBufferSize To tX2 + TileBufferSize
     
-                tempX = mapPreCalcPos(lX, lY).X - UserPos.X * TilePixelWidth + offX
-                tempY = mapPreCalcPos(lX, lY).Y - UserPos.Y * TilePixelHeight + offY
+                tempX = mapPreCalcPos(lX, lY).x - UserPos.x * TilePixelWidth + offX
+                tempY = mapPreCalcPos(lX, lY).y - UserPos.y * TilePixelHeight + offY
     
-                mapData(lX, lY).LightColor(0) = CalcVertexLight(3, Mouse.X, Mouse.Y, tempX + 64, tempY, Color(1), Color(0))
-                mapData(lX, lY).LightColor(1) = CalcVertexLight(3, Mouse.X, Mouse.Y, tempX + 128, tempY + 32, Color(1), Color(0))
-                mapData(lX, lY).LightColor(2) = CalcVertexLight(3, Mouse.X, Mouse.Y, tempX, tempY + 32, Color(1), Color(0))
-                mapData(lX, lY).LightColor(3) = CalcVertexLight(3, Mouse.X, Mouse.Y, tempX + 64, tempY + 64, Color(1), Color(0))
+                mapData(lX, lY).LightColor(0) = CalcVertexLight(3, Mouse.x, Mouse.y, tempX + 64, tempY, Color(1), Color(0))
+                mapData(lX, lY).LightColor(1) = CalcVertexLight(3, Mouse.x, Mouse.y, tempX + 128, tempY + 32, Color(1), Color(0))
+                mapData(lX, lY).LightColor(2) = CalcVertexLight(3, Mouse.x, Mouse.y, tempX, tempY + 32, Color(1), Color(0))
+                mapData(lX, lY).LightColor(3) = CalcVertexLight(3, Mouse.x, Mouse.y, tempX + 64, tempY + 64, Color(1), Color(0))
     
                 'vertex(0) = setVertex(cX + .Width, cY, 0, 1, Color(0), 0, 0, 0)
                 'vertex(1) = setVertex(cX + (.Width * 2), cY + (.Height * 0.5), 0, 1, Color(1), 0, 1, 0)
@@ -1352,8 +1363,8 @@ Private Sub mapRender(ByRef PixelOffset As structPositionSng)
         For lY = tY To tY2 + 2
             For lX = tX - 1 To tX2 + TileBufferSize
                 
-                tempX = mapPreCalcPos(lX, lY).X - UserPos.X * TilePixelWidth + offX
-                tempY = mapPreCalcPos(lX, lY).Y - UserPos.Y * TilePixelHeight + offY
+                tempX = mapPreCalcPos(lX, lY).x - UserPos.x * TilePixelWidth + offX
+                tempY = mapPreCalcPos(lX, lY).y - UserPos.y * TilePixelHeight + offY
                 
                 'Layer 1 **********************************
                 deviceRenderTexture mapData(lX, lY).Layer(1).GrhIndex, _
@@ -1378,8 +1389,8 @@ Private Sub mapRender(ByRef PixelOffset As structPositionSng)
         For lY = tY - TileBufferSize To tY2 + TileBufferSize
             For lX = tX - TileBufferSize To tX2 + TileBufferSize
         
-                tempX = mapPreCalcPos(lX, lY).X - UserPos.X * TilePixelWidth + offX
-                tempY = mapPreCalcPos(lX, lY).Y - UserPos.Y * TilePixelHeight + offY
+                tempX = mapPreCalcPos(lX, lY).x - UserPos.x * TilePixelWidth + offX
+                tempY = mapPreCalcPos(lX, lY).y - UserPos.y * TilePixelHeight + offY
         
                 'Layer 3 **********************************
                 If mapData(lX, lY).Layer(3).GrhIndex > 0 Then
@@ -1396,8 +1407,8 @@ Private Sub mapRender(ByRef PixelOffset As structPositionSng)
         For lY = tY - TileBufferSize To tY2 + TileBufferSize
             For lX = tX - TileBufferSize To tX2 + TileBufferSize
         
-                tempX = mapPreCalcPos(lX, lY).X - UserPos.X * TilePixelWidth + offX
-                tempY = mapPreCalcPos(lX, lY).Y - UserPos.Y * TilePixelHeight + offY
+                tempX = mapPreCalcPos(lX, lY).x - UserPos.x * TilePixelWidth + offX
+                tempY = mapPreCalcPos(lX, lY).y - UserPos.y * TilePixelHeight + offY
         
                 'ParticleLayer ****************************
                 If mapData(lX, lY).particleIndex > 0 Then
@@ -1467,14 +1478,14 @@ Private Sub RenderParticleGroup(grIndex As Integer)
     End With
     
 End Sub
-Private Sub deviceRenderTexture(ByRef GrhIndex As Long, ByRef cX As Single, ByRef cY As Single, ByRef Color() As Long, ByRef Iso As IsometricType, Optional ByRef Angle As Single = 0)
+Private Sub deviceRenderTexture(ByRef GrhIndex As Long, ByRef cx As Single, ByRef cy As Single, ByRef Color() As Long, ByRef Iso As IsometricType, Optional ByRef Angle As Single = 0)
         
     #If LoadingMetod = 0 Then
     
     If textureLoad(GrhIndex) = False Then Exit Sub
     
     If Not oGraphic(lKeys(Grh(GrhIndex).FileNum)).D3DTexture Is Nothing Then
-        GeometryBoxType Grh(GrhIndex), cX, cY, Vector, Color(), Iso, Angle
+        GeometryBoxType Grh(GrhIndex), cx, cy, Vector, Color(), Iso, Angle
     End If
                
     D3DDevice.SetTexture 0, oGraphic(lKeys(Grh(GrhIndex).FileNum)).D3DTexture
@@ -1486,7 +1497,7 @@ Private Sub deviceRenderTexture(ByRef GrhIndex As Long, ByRef cX As Single, ByRe
     Set d3dSurface.Surface = getSurface(Grh(GrhIndex).FileNum, d3dSurface.Width, d3dSurface.Height)
     
     If Not d3dSurface.Surface Is Nothing Then
-        GeometryBoxType Grh(GrhIndex), cX, cY, Vector, Color(), Iso, Angle
+        GeometryBoxType Grh(GrhIndex), cx, cy, Vector, Color(), Iso, Angle
     End If
     
     D3DDevice.SetTexture 0, d3dSurface.Surface
@@ -1502,17 +1513,17 @@ Private Sub deviceRenderTexture(ByRef GrhIndex As Long, ByRef cX As Single, ByRe
             Vector(0), Len(Vector(0))
                 
 End Sub
-Private Function GeometryBoxType(ByRef Grh As structGrhData, ByRef cX As Single, ByRef cY As Single, vertex() As D3DTLVERTEX, ByRef Color() As Long, ByRef Iso As IsometricType, Optional ByRef Angle As Single = 0)
+Private Function GeometryBoxType(ByRef Grh As structGrhData, ByRef cx As Single, ByRef cy As Single, vertex() As D3DTLVERTEX, ByRef Color() As Long, ByRef Iso As IsometricType, Optional ByRef Angle As Single = 0)
 
         Select Case Iso
             Case IsometricType.Normal
                 
                     With Grh
                     
-                        vertex(0) = setVertex(cX, cY + .Height, 0, 1, Color(0), 0, 0, 1)
-                        vertex(1) = setVertex(cX, cY, 0, 1, Color(1), 0, 0, 0)
-                        vertex(2) = setVertex(cX + .Width, cY + .Height, 0, 1, Color(2), 0, 1, 1)
-                        vertex(3) = setVertex(cX + .Width, cY, 0, 1, Color(3), 0, 1, 0)
+                        vertex(0) = setVertex(cx, cy + .Height, 0, 1, Color(0), 0, 0, 1)
+                        vertex(1) = setVertex(cx, cy, 0, 1, Color(1), 0, 0, 0)
+                        vertex(2) = setVertex(cx + .Width, cy + .Height, 0, 1, Color(2), 0, 1, 1)
+                        vertex(3) = setVertex(cx + .Width, cy, 0, 1, Color(3), 0, 1, 0)
                     
                     End With
                 
@@ -1546,10 +1557,10 @@ Private Function GeometryBoxType(ByRef Grh As structGrhData, ByRef cX As Single,
             
                     With Grh
                         
-                        vertex(0) = setVertex(cX + .Width, cY, 0, 1, Color(0), 0, 0, 0)
-                        vertex(1) = setVertex(cX + (.Width * 2), cY + (.Height * 0.5), 0, 1, Color(1), 0, 1, 0)
-                        vertex(2) = setVertex(cX, cY + (.Height * 0.5), 0, 1, Color(2), 0, 0, 1)
-                        vertex(3) = setVertex(cX + .Width, cY + .Height, 0, 1, Color(3), 0, 1, 1)
+                        vertex(0) = setVertex(cx + .Width, cy, 0, 1, Color(0), 0, 0, 0)
+                        vertex(1) = setVertex(cx + (.Width * 2), cy + (.Height * 0.5), 0, 1, Color(1), 0, 1, 0)
+                        vertex(2) = setVertex(cx, cy + (.Height * 0.5), 0, 1, Color(2), 0, 0, 1)
+                        vertex(3) = setVertex(cx + .Width, cy + .Height, 0, 1, Color(3), 0, 1, 1)
                         
                     End With
                     
@@ -1566,11 +1577,11 @@ Private Function GeometryBoxType(ByRef Grh As structGrhData, ByRef cX As Single,
         End Select
         
 End Function
-Public Function setVertex(ByRef X As Single, ByRef Y As Single, ByRef z As Single, ByRef rhw As Single, ByRef Color As Long, ByRef Specular As Long, ByRef tu As Single, ByRef tv As Single) As D3DTLVERTEX
+Public Function setVertex(ByRef x As Single, ByRef y As Single, ByRef z As Single, ByRef rhw As Single, ByRef Color As Long, ByRef Specular As Long, ByRef tu As Single, ByRef tv As Single) As D3DTLVERTEX
     
     With setVertex
-        .sX = X
-        .sY = Y
+        .sX = x
+        .sY = y
         .sz = z
         .rhw = rhw
         .Color = Color

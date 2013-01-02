@@ -78,7 +78,7 @@ Private Sub Form_Load()
     Sound_Play "mambo.mp3", 1
 End Sub
 
-Private Sub Form_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Form_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
     #If WorldEditor = 1 Then
         If EditMap = True Then
             modMap.mapAddGrh 3 'layer..
@@ -89,46 +89,46 @@ Private Sub Form_MouseDown(Button As Integer, Shift As Integer, X As Single, Y A
     
 End Sub
 
-Private Sub Form_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Form_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
 
     If cMouse = True Then
-        guiEvents X, Y
+        guiEvents x, y
     End If
 
-    Mouse.X = X + RenderRect.X1
-    Mouse.Y = Y + RenderRect.Y1
+    Mouse.x = x + RenderRect.Left
+    Mouse.y = y + RenderRect.Top
     
     'Trim to fit screen
-    If Mouse.X < 0 Then
-        Mouse.X = 0
-    ElseIf Mouse.X > RenderRect.X2 Then
-        Mouse.X = RenderRect.X2
+    If Mouse.x < 0 Then
+        Mouse.x = 0
+    ElseIf Mouse.x > RenderRect.Right Then
+        Mouse.x = RenderRect.Right
     End If
     
     'Trim to fit screen
-    If Mouse.Y < 0 Then
-        Mouse.Y = 0
-    ElseIf Mouse.Y > RenderRect.Y2 Then
-        Mouse.Y = RenderRect.Y2
+    If Mouse.y < 0 Then
+        Mouse.y = 0
+    ElseIf Mouse.y > RenderRect.Bottom Then
+        Mouse.y = RenderRect.Bottom
     End If
     
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Form_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
     
     cMouse = False
     
 End Sub
 
-Private Sub picEditor_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
-    MousePicX = X
-    MousePicY = Y
+Private Sub picEditor_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
+    MousePicX = x
+    MousePicY = y
 End Sub
 
-Private Sub picEditor_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub picEditor_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
     If Button = vbLeftButton Then
-        picEditor.Top = picEditor.Top + Y - MousePicY
-        picEditor.Left = picEditor.Left + X - MousePicX
+        picEditor.Top = picEditor.Top + y - MousePicY
+        picEditor.Left = picEditor.Left + x - MousePicX
     End If
 End Sub
 

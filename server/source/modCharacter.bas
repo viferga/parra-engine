@@ -32,6 +32,10 @@ Public Enum characterDirection
     NorthEast = 2
     SouthWeast = 3
     SouthEast = 4
+    North = 5
+    South = 6
+    East = 7
+    West = 8
 End Enum
 
 Public Enum characterType
@@ -79,15 +83,15 @@ Public Function characterNextOpen() As Integer
         Next i
         
 End Function
-Public Sub characterErase(ByRef charIndex As Integer)
+Public Sub characterErase(ByRef CharIndex As Integer)
 
-    HandleRemoveChar characterList(charIndex).ID
+    HandleRemoveChar characterList(CharIndex).ID
     
     DoEvents
     
-    characterList(charIndex).ID = 0
+    characterList(CharIndex).ID = 0
     
-    If (charIndex = charLast) Then
+    If (CharIndex = charLast) Then
         Do Until characterList(charLast).ID > 0
            If (charLast <= 1) Then Exit Do
            charLast = charLast - 1
@@ -96,30 +100,30 @@ Public Sub characterErase(ByRef charIndex As Integer)
     
 End Sub
 
-Public Function characterMove(ByRef charIndex As Integer, ByRef charType As characterType, Direction As characterDirection)
+Public Function characterMove(ByRef CharIndex As Integer, ByRef charType As characterType, Direction As characterDirection)
     
     
     Select Case charType
     
         Case characterType.player
 
-            characterMoveDirection playerList(characterList(charIndex).ID).Pos, Direction
+            characterMoveDirection playerList(characterList(CharIndex).ID).Pos, Direction
                 
         Case characterType.Npc
           
-            characterMoveDirection npcList(characterList(charIndex).ID).Pos, Direction
+            characterMoveDirection npcList(characterList(CharIndex).ID).Pos, Direction
 
     End Select
     
 End Function
-Public Function characterPosition(ByRef charIndex As Integer) As characterWorldPos
+Public Function characterPosition(ByRef CharIndex As Integer) As characterWorldPos
     
-    Select Case characterList(charIndex).Type
+    Select Case characterList(CharIndex).Type
         Case characterType.player
-            characterPosition = playerList(characterList(charIndex).ID).Pos
+            characterPosition = playerList(characterList(CharIndex).ID).Pos
             
         Case characterType.Npc
-            characterPosition = npcList(characterList(charIndex).ID).Pos
+            characterPosition = npcList(characterList(CharIndex).ID).Pos
             
     End Select
     
@@ -144,24 +148,24 @@ Private Function characterMoveDirection(ByRef Position As characterWorldPos, Dir
     End With
 
 End Function
-Public Function characterMake(ByRef charIndex As Integer, charID As Integer, charType As characterType)
+Public Function characterMake(ByRef CharIndex As Integer, charID As Integer, charType As characterType)
 
     Dim charPos As characterWorldPos
     
-        With characterList(charIndex)
+        With characterList(CharIndex)
                 .ID = charID
                 .Type = charType
         End With
             
-        charPos = characterPosition(charIndex)
+        charPos = characterPosition(CharIndex)
         
         Select Case charType
         
             Case characterType.player
             
-                    With playerList(characterList(charIndex).ID)
+                    With playerList(characterList(CharIndex).ID)
                     
-                       HandleCreateChar charIndex, .Char, .Pos, .Name
+                       HandleCreateChar CharIndex, .Char, .Pos, .Name
                 
                     End With
                   
@@ -169,9 +173,9 @@ Public Function characterMake(ByRef charIndex As Integer, charID As Integer, cha
                  
             Case characterType.Npc
             
-                    With npcList(characterList(charIndex).ID)
+                    With npcList(characterList(CharIndex).ID)
                     
-                        HandleCreateChar charIndex, .Char, .Pos
+                        HandleCreateChar CharIndex, .Char, .Pos
                     
                     End With
                     

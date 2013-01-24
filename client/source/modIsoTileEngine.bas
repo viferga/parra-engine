@@ -86,6 +86,11 @@ Public Type Character
     MoveOffset As structPositionSng
 End Type
 
+Public Enum characterType
+    player = 0
+    Npc = 1
+End Enum
+
 Public characterList() As Character
 Public charLast As Integer
 
@@ -173,27 +178,27 @@ Public Declare Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCou
 
 Private Declare Function GetWindowRect Lib "user32.dll" (ByVal hwnd As Long, ByRef RECT As RECT) As Long
 Private Declare Function GetClientRect Lib "user32.dll" (ByVal hwnd As Long, ByRef RECT As RECT) As Long
-Private Declare Function SetWindowPos Lib "user32.dll" (ByVal hwnd As Long, ByVal hwndafter As Long, ByVal x As Long, ByVal y As Long, ByVal cx As Long, ByVal cy As Long, ByVal options As Long) As Long
+Private Declare Function SetWindowPos Lib "user32.dll" (ByVal hwnd As Long, ByVal hwndafter As Long, ByVal X As Long, ByVal y As Long, ByVal cx As Long, ByVal cy As Long, ByVal options As Long) As Long
 'Private Declare Function SetWindowLongA Lib "user32.dll" (ByVal hwnd As Long, ByVal nIndex As Long, ByVal newVal As Long) As Long
 'Private Declare Function GetWindowLongA Lib "user32.dll" (ByVal hwnd As Long, ByVal nIndex As Long) As Long
 
 Public Sub initializeIndex()
-    Dim i As Long
+    Dim I As Long
     
       ReDim Preserve Grh(1 To GetVar(App.Path & "\Init\grh.ini", "INIT", "numGrh")) As structGrhData
     
-        For i = 1 To UBound(Grh)
+        For I = 1 To UBound(Grh)
         
-            With Grh(i)
-                .FileNum = ReadField(1, GetVar(App.Path & "\Init\grh.ini", "GRH", "grh" & CStr(i)), Asc("-"))
-                .sX = ReadField(2, GetVar(App.Path & "\Init\grh.ini", "GRH", "grh" & CStr(i)), Asc("-"))
-                .sY = ReadField(3, GetVar(App.Path & "\Init\grh.ini", "GRH", "grh" & CStr(i)), Asc("-"))
-                .Width = ReadField(4, GetVar(App.Path & "\Init\grh.ini", "GRH", "grh" & CStr(i)), Asc("-"))
-                .Height = ReadField(5, GetVar(App.Path & "\Init\grh.ini", "GRH", "grh" & CStr(i)), Asc("-"))
-                .offsetX = ReadField(6, GetVar(App.Path & "\Init\grh.ini", "GRH", "grh" & CStr(i)), Asc("-"))
-                .offsetY = ReadField(7, GetVar(App.Path & "\Init\grh.ini", "GRH", "grh" & CStr(i)), Asc("-"))
+            With Grh(I)
+                .FileNum = ReadField(1, GetVar(App.Path & "\Init\grh.ini", "GRH", "grh" & CStr(I)), Asc("-"))
+                .sX = ReadField(2, GetVar(App.Path & "\Init\grh.ini", "GRH", "grh" & CStr(I)), Asc("-"))
+                .sY = ReadField(3, GetVar(App.Path & "\Init\grh.ini", "GRH", "grh" & CStr(I)), Asc("-"))
+                .Width = ReadField(4, GetVar(App.Path & "\Init\grh.ini", "GRH", "grh" & CStr(I)), Asc("-"))
+                .Height = ReadField(5, GetVar(App.Path & "\Init\grh.ini", "GRH", "grh" & CStr(I)), Asc("-"))
+                .offsetX = ReadField(6, GetVar(App.Path & "\Init\grh.ini", "GRH", "grh" & CStr(I)), Asc("-"))
+                .offsetY = ReadField(7, GetVar(App.Path & "\Init\grh.ini", "GRH", "grh" & CStr(I)), Asc("-"))
                                 
-                .NumFrames = ReadField(8, GetVar(App.Path & "\Init\grh.ini", "GRH", "grh" & CStr(i)), Asc("-"))
+                .NumFrames = ReadField(8, GetVar(App.Path & "\Init\grh.ini", "GRH", "grh" & CStr(I)), Asc("-"))
                 
                 ReDim .Frames(1 To .NumFrames)
                 
@@ -203,23 +208,23 @@ Public Sub initializeIndex()
                     
                     For frameCount = 1 To .NumFrames
                          .Frames(frameCount) = ReadField(frameCount + 8, _
-                                                GetVar(App.Path & "\Init\grh.ini", "GRH", "grh" & CStr(i)), Asc("-"))
+                                                GetVar(App.Path & "\Init\grh.ini", "GRH", "grh" & CStr(I)), Asc("-"))
                     Next frameCount
 
                 Else
 
-                    .Frames(1) = i
+                    .Frames(1) = I
                 End If
                 
-                .Speed = ReadField(.NumFrames + 8, GetVar(App.Path & "\Init\grh.ini", "GRH", "grh" & CStr(i)), Asc("-"))
+                .Speed = ReadField(.NumFrames + 8, GetVar(App.Path & "\Init\grh.ini", "GRH", "grh" & CStr(I)), Asc("-"))
                 
             End With
             
             #If WorldEditor = 1 Then
                 'Add GrhList
-                frmMain.grhList.AddItem "Grh" & CStr(i)
+                frmMain.grhList.AddItem "Grh" & CStr(I)
             #End If
-        Next i
+        Next I
     
 End Sub
 Private Sub initializeGrhAnim(ByRef cGrh As structGrh, ByVal GrhIndex As Integer, Optional ByVal Started As Byte = 2)
@@ -261,11 +266,11 @@ Public Sub showNextFrame()
     If UserMoving Then
     
     '****** Move screen Left and Right if needed ******
-        If AddtoUserPos.x <> 0 Then
-            OffsetCounter.x = OffsetCounter.x - ScrollPixelsPerFrame.x * AddtoUserPos.x * timerTicksPerFrame
-            If Abs(OffsetCounter.x) >= Abs(TilePixelWidth * AddtoUserPos.x) Then
-                OffsetCounter.x = 0
-                AddtoUserPos.x = 0
+        If AddtoUserPos.X <> 0 Then
+            OffsetCounter.X = OffsetCounter.X - ScrollPixelsPerFrame.X * AddtoUserPos.X * timerTicksPerFrame
+            If Abs(OffsetCounter.X) >= Abs(TilePixelWidth * AddtoUserPos.X) Then
+                OffsetCounter.X = 0
+                AddtoUserPos.X = 0
                 UserMoving = False
             End If
         End If
@@ -306,7 +311,7 @@ Public Sub showNextFrame()
                'Render Map
                 mapRender OffsetCounter
 
-                fontRender CStr("X: " & CStr(UserPos.x) & " Y: " & CStr(UserPos.y)), 2, 300, 0, 130, 20, DT_LEFT
+                fontRender CStr("X: " & CStr(UserPos.X) & " Y: " & CStr(UserPos.y)), 2, 300, 0, 130, 20, DT_LEFT
             
             #If ParticleEditor = 1 Then
                 End If
@@ -316,11 +321,11 @@ Public Sub showNextFrame()
                 
                 #If WorldEditor = 1 Then
                     If EditMap = True Then
-                        fontRender CStr("MouseX: " & CStr(MouseTilesPos.x) & " MouseY: " & CStr(MouseTilesPos.y)), 2, 560, 1, 240, 20, DT_LEFT
+                        fontRender CStr("MouseX: " & CStr(MouseTilesPos.X) & " MouseY: " & CStr(MouseTilesPos.y)), 2, 560, 1, 240, 20, DT_LEFT
                         
                         'Render grhSelected
                         If frmMain.grhList.ListIndex + 1 > 0 Then
-                            deviceRenderTexture frmMain.grhList.ListIndex + 1, Mouse.x, Mouse.y, BasicColor(), frmMain.cmbMode.ListIndex
+                            deviceRenderTexture frmMain.grhList.ListIndex + 1, Mouse.X, Mouse.y, BasicColor(), frmMain.cmbMode.ListIndex
                         End If
                     End If
                 #End If
@@ -564,7 +569,7 @@ On Error GoTo errHandle
     Color(1).r = 250: Color(1).g = 250: Color(1).b = 200
     
     'Pixelsperframe for tile engine
-    ScrollPixelsPerFrame.x = 8
+    ScrollPixelsPerFrame.X = 8
     ScrollPixelsPerFrame.y = 8
     
     'Create a pixel shader
@@ -1037,38 +1042,38 @@ Private Sub ResetMotionStates()
 End Sub
 
 Public Function fontInitializing(ByRef Size As Byte) As Boolean
-    Dim i As Byte
+    Dim I As Byte
     
     ReDim Preserve Font(1 To Size) As FontInfo
     
     ' Set configuration
-    For i = 1 To UBound(Font)
-        With Font(i)
-            .MainFontFormat.Name = GetVar(App.Path & "\Init\Fonts.ini", "Font" & CStr(i), "Name")
-            .MainFontFormat.Size = GetVar(App.Path & "\Init\Fonts.ini", "Font" & CStr(i), "Size")
-            .Color = D3DColorARGB(ReadField(1, GetVar(App.Path & "\Init\Fonts.ini", "Font" & CStr(i), "ARGB"), Asc("-")), _
-                                                  ReadField(2, GetVar(App.Path & "\Init\Fonts.ini", "Font" & CStr(i), "ARGB"), Asc("-")), _
-                                                  ReadField(3, GetVar(App.Path & "\Init\Fonts.ini", "Font" & CStr(i), "ARGB"), Asc("-")), _
-                                                  ReadField(4, GetVar(App.Path & "\Init\Fonts.ini", "Font" & CStr(i), "ARGB"), Asc("-")))
+    For I = 1 To UBound(Font)
+        With Font(I)
+            .MainFontFormat.Name = GetVar(App.Path & "\Init\Fonts.ini", "Font" & CStr(I), "Name")
+            .MainFontFormat.Size = GetVar(App.Path & "\Init\Fonts.ini", "Font" & CStr(I), "Size")
+            .Color = D3DColorARGB(ReadField(1, GetVar(App.Path & "\Init\Fonts.ini", "Font" & CStr(I), "ARGB"), Asc("-")), _
+                                                  ReadField(2, GetVar(App.Path & "\Init\Fonts.ini", "Font" & CStr(I), "ARGB"), Asc("-")), _
+                                                  ReadField(3, GetVar(App.Path & "\Init\Fonts.ini", "Font" & CStr(I), "ARGB"), Asc("-")), _
+                                                  ReadField(4, GetVar(App.Path & "\Init\Fonts.ini", "Font" & CStr(I), "ARGB"), Asc("-")))
     
             Set .MainFontDesc = .MainFontFormat
             Set .MainFont = D3DX.CreateFont(D3DDevice, .MainFontDesc.hFont)
         End With
-    Next i
+    Next I
     
 End Function
 Public Sub fontDeInitializing()
-    Dim i As Byte
+    Dim I As Byte
     
-    For i = 1 To UBound(Font)
-        Set Font(i).MainFont = Nothing
-        Set Font(i).MainFontDesc = Nothing
-        Set Font(i).MainFontFormat = Nothing
-    Next i
+    For I = 1 To UBound(Font)
+        Set Font(I).MainFont = Nothing
+        Set Font(I).MainFontDesc = Nothing
+        Set Font(I).MainFontFormat = Nothing
+    Next I
     
 End Sub
 Private Sub fontRender(ByRef Text As String, ByRef Index As Byte, _
-                            ByRef x As Integer, ByRef y As Integer, _
+                            ByRef X As Integer, ByRef y As Integer, _
                             ByRef Width As Integer, ByRef Height As Integer, _
                             Format As Long)
                             
@@ -1076,45 +1081,47 @@ Private Sub fontRender(ByRef Text As String, ByRef Index As Byte, _
     
     With fontRect
         .Top = y + RenderRect.Top
-        .Left = x + RenderRect.Left
+        .Left = X + RenderRect.Left
         .Bottom = y + Height + RenderRect.Top
-        .Right = x + Width + RenderRect.Left
+        .Right = X + Width + RenderRect.Left
     End With
     
     D3DX.DrawText Font(Index).MainFont, Font(Index).Color, Text, fontRect, Format
 End Sub
 Public Sub Move(ByVal Direction As eDirection)
     
-    Dim x As Integer
+    Dim X As Integer
     Dim y As Integer
     
     'Figure out which way to move
     Select Case Direction
-        Case eDirection.NorthEast: y = -1: x = 1
+        Case eDirection.NorthEast: y = -1: X = 1
         
-        Case eDirection.NorthWest: y = -1: x = -1
+        Case eDirection.NorthWest: y = -1: X = -1
         
-        Case eDirection.SouthEast: y = 1: x = 1
+        Case eDirection.SouthEast: y = 1: X = 1
         
-        Case eDirection.SouthWest: y = 1: x = -1
+        Case eDirection.SouthWest: y = 1: X = -1
         
-        Case eDirection.North: y = -1: x = 0
+        Case eDirection.North: y = -1: X = 0
         
-        Case eDirection.South: y = 1: x = 0
+        Case eDirection.South: y = 1: X = 0
         
-        Case eDirection.East: y = 0: x = 1
+        Case eDirection.East: y = 0: X = 1
         
-        Case eDirection.West: y = 0: x = -1
+        Case eDirection.West: y = 0: X = -1
         
     End Select
     
     Dim PositionOk As Boolean
     
-    PositionOk = mapLegalPos(UserPos.x + x, UserPos.y + y)
+    PositionOk = mapLegalPos(UserPos.X + X, UserPos.y + y)
     
     If PositionOk Then 'and usernot paralizate, etc..
         MoveChar playerCharIndex, Direction
         MoveScreen Direction
+        WriteCharEvents 1, playerCharIndex, player
+        'faltaria lo de npc
     Else
         If characterList(playerCharIndex).Heading <> Direction Then
             'writechangeheading direction
@@ -1125,12 +1132,12 @@ End Sub
 Private Sub MoveChar(ByRef characterIndex As Integer, Direction As eDirection)
 
     Dim addX As Integer, addY As Integer
-    Dim x As Integer, y As Integer
+    Dim X As Integer, y As Integer
     
     With characterList(characterIndex)
-        x = .Pos.x
+        X = .Pos.X
         y = .Pos.y
-        
+
         'Figure out which way to move
         Select Case Direction
         
@@ -1168,18 +1175,18 @@ Private Sub MoveChar(ByRef characterIndex As Integer, Direction As eDirection)
                 
         End Select
         
-        mapData(x + addX, y + addY).CharIndex = characterIndex
-        .Pos.x = x + addX
+        mapData(X + addX, y + addY).charindex = characterIndex
+        .Pos.X = X + addX
         .Pos.y = y + addY
-        mapData(x, y).CharIndex = 0
+        mapData(X, y).charindex = 0
         
-        .MoveOffset.x = -1 * (TilePixelWidth * addX)
+        .MoveOffset.X = -1 * (TilePixelWidth * addX)
         .MoveOffset.y = -1 * (TilePixelHeight * addY)
         
         .Moving = 1
         .Heading = Direction
         
-        .scrollDirection.x = addX
+        .scrollDirection.X = addX
         .scrollDirection.y = addY
     End With
     
@@ -1187,14 +1194,14 @@ Private Sub MoveChar(ByRef characterIndex As Integer, Direction As eDirection)
     
     'areas viejos
     
-    If mapInBounds(x + addX, y + addY) = False Then
+    If mapInBounds(X + addX, y + addY) = False Then
         'charactererase characterIndex
     End If
 
 End Sub
 Private Sub MoveScreen(Direction As eDirection)
     
-    Dim x As Integer
+    Dim X As Integer
     Dim y As Integer
     Dim tX As Integer
     Dim tY As Integer
@@ -1202,27 +1209,27 @@ Private Sub MoveScreen(Direction As eDirection)
     'Figure out which way to move
         Select Case Direction
         
-            Case eDirection.NorthEast: y = -1: x = 1
+            Case eDirection.NorthEast: y = -1: X = 1
             
-            Case eDirection.NorthWest: y = -1: x = -1
+            Case eDirection.NorthWest: y = -1: X = -1
             
-            Case eDirection.SouthEast: y = 1: x = 1
+            Case eDirection.SouthEast: y = 1: X = 1
             
-            Case eDirection.SouthWest: y = 1: x = -1
+            Case eDirection.SouthWest: y = 1: X = -1
             
-            Case eDirection.North: y = -1: x = 0
+            Case eDirection.North: y = -1: X = 0
             
-            Case eDirection.South: y = 1: x = 0
+            Case eDirection.South: y = 1: X = 0
             
-            Case eDirection.East: y = 0: x = 1
+            Case eDirection.East: y = 0: X = 1
             
-            Case eDirection.West: y = 0: x = -1
+            Case eDirection.West: y = 0: X = -1
     
                 
         End Select
     
     'Fill temp pos
-    tX = UserPos.x + x
+    tX = UserPos.X + X
     tY = UserPos.y + y
     
     'Check to see if its out of bounds
@@ -1230,9 +1237,9 @@ Private Sub MoveScreen(Direction As eDirection)
         Exit Sub
     Else
         'Start moving... MainLoop does the rest
-        AddtoUserPos.x = x
+        AddtoUserPos.X = X
         AddtoUserPos.y = y
-        UserPos.x = tX
+        UserPos.X = tX
         UserPos.y = tY
         UserMoving = 1
     End If
@@ -1245,11 +1252,11 @@ Private Sub mapRender(ByRef PixelOffset As structPositionSng)
         Dim tempX As Single, tempY As Single ' temp position
         Dim offX As Single, offY As Single ' temp offset
         
-        If PixelOffset.x <> 0 Then
-            If PixelOffset.x < 0 Then
-                offX = 64 + PixelOffset.x
+        If PixelOffset.X <> 0 Then
+            If PixelOffset.X < 0 Then
+                offX = 64 + PixelOffset.X
             Else
-                offX = -64 + PixelOffset.x
+                offX = -64 + PixelOffset.X
             End If
         End If
         
@@ -1264,7 +1271,7 @@ Private Sub mapRender(ByRef PixelOffset As structPositionSng)
         
         ' Controla el tamaño de tX & tY
         
-        tX = UserPos.x
+        tX = UserPos.X
         tY = UserPos.y
         
         If tY - TileBufferSize < 1 Then
@@ -1307,27 +1314,27 @@ Private Sub mapRender(ByRef PixelOffset As structPositionSng)
         
         ' Controla el mouseTilePos
         
-        MouseTilesPos.x = (UserPos.x * 64 + Mouse.x) \ TilePixelWidth
+        MouseTilesPos.X = (UserPos.X * 64 + Mouse.X) \ TilePixelWidth
         MouseTilesPos.y = (UserPos.y * 64 + Mouse.y) \ TilePixelHeight
         
-        If MouseTilesPos.x < 1 Then
-            MouseTilesPos.x = 1
+        If MouseTilesPos.X < 1 Then
+            MouseTilesPos.X = 1
         End If
         
         If MouseTilesPos.y < 1 Then
             MouseTilesPos.y = 1
         End If
         
-        If MouseTilesPos.x > MaxTilesX Then
-            MouseTilesPos.x = MaxTilesX
+        If MouseTilesPos.X > MaxTilesX Then
+            MouseTilesPos.X = MaxTilesX
         End If
         
         If MouseTilesPos.y > MaxTilesY Then
             MouseTilesPos.y = MaxTilesY
         End If
         
-        MousePosOnMap.x = mapPreCalcPos(MouseTilesPos.x, MouseTilesPos.y).x
-        MousePosOnMap.y = mapPreCalcPos(MouseTilesPos.x, MouseTilesPos.y).y
+        MousePosOnMap.X = mapPreCalcPos(MouseTilesPos.X, MouseTilesPos.y).X
+        MousePosOnMap.y = mapPreCalcPos(MouseTilesPos.X, MouseTilesPos.y).y
         
     Static LastCount As Long
     
@@ -1336,13 +1343,13 @@ Private Sub mapRender(ByRef PixelOffset As structPositionSng)
         For lY = tY - TileBufferSize To tY2 + TileBufferSize
             For lX = tX - TileBufferSize To tX2 + TileBufferSize
     
-                tempX = mapPreCalcPos(lX, lY).x - UserPos.x * TilePixelWidth + offX
+                tempX = mapPreCalcPos(lX, lY).X - UserPos.X * TilePixelWidth + offX
                 tempY = mapPreCalcPos(lX, lY).y - UserPos.y * TilePixelHeight + offY
     
-                mapData(lX, lY).LightColor(0) = CalcVertexLight(3, Mouse.x, Mouse.y, tempX + 64, tempY, Color(1), Color(0))
-                mapData(lX, lY).LightColor(1) = CalcVertexLight(3, Mouse.x, Mouse.y, tempX + 128, tempY + 32, Color(1), Color(0))
-                mapData(lX, lY).LightColor(2) = CalcVertexLight(3, Mouse.x, Mouse.y, tempX, tempY + 32, Color(1), Color(0))
-                mapData(lX, lY).LightColor(3) = CalcVertexLight(3, Mouse.x, Mouse.y, tempX + 64, tempY + 64, Color(1), Color(0))
+                mapData(lX, lY).LightColor(0) = CalcVertexLight(3, Mouse.X, Mouse.y, tempX + 64, tempY, Color(1), Color(0))
+                mapData(lX, lY).LightColor(1) = CalcVertexLight(3, Mouse.X, Mouse.y, tempX + 128, tempY + 32, Color(1), Color(0))
+                mapData(lX, lY).LightColor(2) = CalcVertexLight(3, Mouse.X, Mouse.y, tempX, tempY + 32, Color(1), Color(0))
+                mapData(lX, lY).LightColor(3) = CalcVertexLight(3, Mouse.X, Mouse.y, tempX + 64, tempY + 64, Color(1), Color(0))
     
                 'vertex(0) = setVertex(cX + .Width, cY, 0, 1, Color(0), 0, 0, 0)
                 'vertex(1) = setVertex(cX + (.Width * 2), cY + (.Height * 0.5), 0, 1, Color(1), 0, 1, 0)
@@ -1363,7 +1370,7 @@ Private Sub mapRender(ByRef PixelOffset As structPositionSng)
         For lY = tY To tY2 + 2
             For lX = tX - 1 To tX2 + TileBufferSize
                 
-                tempX = mapPreCalcPos(lX, lY).x - UserPos.x * TilePixelWidth + offX
+                tempX = mapPreCalcPos(lX, lY).X - UserPos.X * TilePixelWidth + offX
                 tempY = mapPreCalcPos(lX, lY).y - UserPos.y * TilePixelHeight + offY
                 
                 'Layer 1 **********************************
@@ -1389,7 +1396,7 @@ Private Sub mapRender(ByRef PixelOffset As structPositionSng)
         For lY = tY - TileBufferSize To tY2 + TileBufferSize
             For lX = tX - TileBufferSize To tX2 + TileBufferSize
         
-                tempX = mapPreCalcPos(lX, lY).x - UserPos.x * TilePixelWidth + offX
+                tempX = mapPreCalcPos(lX, lY).X - UserPos.X * TilePixelWidth + offX
                 tempY = mapPreCalcPos(lX, lY).y - UserPos.y * TilePixelHeight + offY
         
                 'Layer 3 **********************************
@@ -1407,7 +1414,7 @@ Private Sub mapRender(ByRef PixelOffset As structPositionSng)
         For lY = tY - TileBufferSize To tY2 + TileBufferSize
             For lX = tX - TileBufferSize To tX2 + TileBufferSize
         
-                tempX = mapPreCalcPos(lX, lY).x - UserPos.x * TilePixelWidth + offX
+                tempX = mapPreCalcPos(lX, lY).X - UserPos.X * TilePixelWidth + offX
                 tempY = mapPreCalcPos(lX, lY).y - UserPos.y * TilePixelHeight + offY
         
                 'ParticleLayer ****************************
@@ -1577,10 +1584,10 @@ Private Function GeometryBoxType(ByRef Grh As structGrhData, ByRef cx As Single,
         End Select
         
 End Function
-Public Function setVertex(ByRef x As Single, ByRef y As Single, ByRef z As Single, ByRef rhw As Single, ByRef Color As Long, ByRef Specular As Long, ByRef tu As Single, ByRef tv As Single) As D3DTLVERTEX
+Public Function setVertex(ByRef X As Single, ByRef y As Single, ByRef z As Single, ByRef rhw As Single, ByRef Color As Long, ByRef Specular As Long, ByRef tu As Single, ByRef tv As Single) As D3DTLVERTEX
     
     With setVertex
-        .sX = x
+        .sX = X
         .sY = y
         .sz = z
         .rhw = rhw

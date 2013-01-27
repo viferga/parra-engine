@@ -72,9 +72,9 @@ Public Sub HandleIncomingData()
                     HandleIncomingCharacterRemove
                 End If
         
-        Case ServerPacketID.CharMove
-                HandleCharacterMove
-                Exit Sub
+       ' Case ServerPacketID.UserEvents
+         '       HandleCharacterMove
+         '       Exit Sub
                 
         Case Else: Exit Sub
     End Select
@@ -185,7 +185,6 @@ End Sub
 Private Sub HandleIncomingCharacterCreate()
 
     'Remove packet ID
-    Call incomingData.ReadByte 'GDK: faltaba esto xD
     
         Dim charindex As Integer
         charindex = incomingData.ReadInteger()
@@ -206,13 +205,13 @@ Private Sub HandleIncomingCharacterCreate()
             .Head = incomingData.ReadInteger()
             .Heading = incomingData.ReadByte()
             .Pos.X = incomingData.ReadByte()
-            .Pos.y = incomingData.ReadByte()
+            .Pos.Y = incomingData.ReadByte()
             
             If .Name = frmConnect.UserName Then
                 playerCharIndex = charindex
                 
                 UserPos.X = .Pos.X
-                UserPos.y = .Pos.y
+                UserPos.Y = .Pos.Y
             
             End If
         
@@ -222,9 +221,6 @@ Private Sub HandleIncomingCharacterCreate()
 End Sub
 
 Private Sub HandleIncomingCharacterRemove()
-
-    'Remove packet ID
-    Call incomingData.ReadByte 'GDK: faltaba aca también
 
     Dim charindex As Integer
     charindex = incomingData.ReadInteger()
@@ -241,14 +237,14 @@ Private Sub HandleIncomingCharacterRemove()
             Loop
         End If
         
-        mapData(.Pos.X, .Pos.y).charindex = 0
+        mapData(.Pos.X, .Pos.Y).charindex = 0
 
         .Body = 0
         .FXIndex = 0
         .Head = 0
         .Heading = 0
         .Pos.X = 0
-        .Pos.y = 0
+        .Pos.Y = 0
         .Name = ""
         .Moving = 0
     

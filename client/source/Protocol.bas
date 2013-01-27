@@ -72,9 +72,6 @@ Public Sub HandleIncomingData()
                     HandleIncomingCharacterRemove
                 End If
         
-       ' Case ServerPacketID.UserEvents
-         '       HandleCharacterMove
-         '       Exit Sub
                 
         Case Else: Exit Sub
     End Select

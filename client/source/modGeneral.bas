@@ -1,6 +1,7 @@
 Attribute VB_Name = "modGeneral"
 Option Explicit
 
+Public GraphicalDevice As clsGraphicalDevice
 Public Mouse As structPositionSng
 
 Public generalIP As String
@@ -17,12 +18,12 @@ Private Declare Function GetKeyState Lib "user32" (ByVal nVirtKey As Long) As Lo
 'MouseInput
 Private Type PointAPI
     X As Long
-    y As Long
+    Y As Long
 End Type
 
 'Private Declare Function GetCursorPos Lib "user32" (lpPoint As PointAPI) As Long
 Private Declare Function GetActiveWindow Lib "user32" () As Long
-Public Declare Function SetWindowPos Lib "user32" (ByVal hwnd As Long, ByVal hWndInsertAfter As Long, ByVal X As Long, ByVal y As Long, ByVal cx As Long, ByVal cy As Long, ByVal wFlags As Long) As Long
+Public Declare Function SetWindowPos Lib "user32" (ByVal hwnd As Long, ByVal hWndInsertAfter As Long, ByVal X As Long, ByVal Y As Long, ByVal cx As Long, ByVal cy As Long, ByVal wFlags As Long) As Long
 Sub main()
 
     IntializeRandom

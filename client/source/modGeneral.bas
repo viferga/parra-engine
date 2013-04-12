@@ -42,7 +42,7 @@ Sub main()
     gamePaused = True
     
     'bRunning is true if TileEninge initialize correctly
-    bRunning = engineInitializing(0, 0, 800, 600, frmMain, 16, True)   '553
+    bRunning = GraphicalDevice.Initialize(0, 0, 800, 600, frmMain, 16, True)   '553
     
     'Load MapData
     mapLoadAll
@@ -65,7 +65,7 @@ Sub main()
     mapUnloadAll
     
     'Deinit engine
-    engineDeinitializing
+    GraphicalDevice.DeInitialize
     
     'Stop Audio
     Sound_Destroy
@@ -258,7 +258,7 @@ Private Sub gameCheckRoutineKeys()
         End If
         
         If GetKeyState(vbKeyS) < 0 Then
-            ShowShader = Not ShowShader
+            'ShowShader = Not ShowShader
             Exit Sub
         End If
         

@@ -13,22 +13,6 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-Public Type Color4Byte
- Red As Byte
- Green As Byte
- Blue As Byte
- Alpha As Byte
-End Type
-
-Public Type Texture
-  ID As Long
-  Width As Long
-  Height As Long
-  TexWidth As Long
-  TexHeight As Long
-  Pixels() As Color4Byte
-End Type
-
 Private Type videoMode
      Width As Long
      Height As Long
@@ -71,23 +55,55 @@ Public Function DeviceIsContextValid() As DEVICE_NO_ERROR
 
 End Function
 
-Public Sub BeginScene(ClearRect As Rect, flags As CLEAR_FLAGS)
+Public Sub BeginScene(ClearRect As RECT, flags As CLEAR_FLAGS)
 
 End Sub
 
-Public Sub EndScene(DestRect As Rect, hwnd As Long)
+Public Sub EndScene(DestRect As RECT, hwnd As Long)
 
 End Sub
 
-Public Function TextureGet(ByVal index As Long, ByVal Width, ByVal Height) As Texture
+Public Function initializeMotionBlur() As Boolean
 
 End Function
 
-Public Function TextureBind(ByVal index As Long) As Boolean
+Public Sub fontRender(ByRef Text As String, ByRef index As Byte, _
+                            ByRef X As Integer, ByRef Y As Integer, _
+                            ByRef Width As Integer, ByRef Height As Integer, _
+                            format As Long) 'GDK: revisar parametros, no se si seran igual en ogl.
+                            
+
+End Sub
+Public Function fontInitializing(ByRef Size As Byte) As Boolean
 
 End Function
 
-Public Function TextureBindEx(ByRef Texture As Texture) As Boolean
+Public Sub guiRender()
+
+End Sub
+
+Public Sub resetRenderStates()
+
+End Sub
+
+Public Sub resetMotionStates()
+
+End Sub
+
+Public Sub renderBox(X1 As Single, Y1 As Single, X2 As Single, Y2 As Single, _
+                            Optional ByVal v1 As Long = -1, Optional ByVal v2 As Long = -1, _
+                            Optional ByVal v3 As Long = -1, Optional ByVal v4 As Long = -1)
+
+End Sub
+
+Public Sub renderParticleGroup(grIndex As Integer)
+
+End Sub
+
+Public Sub renderTexture(ByRef GrhIndex As Long, ByRef cx As Single, ByRef cy As Single, ByRef Color() As Long, ByRef Iso As IsometricType, Optional ByRef Angle As Single = 0)
+
+End Sub
+
+Public Function FloatToDWord(flo As Single) As Long
 
 End Function
-

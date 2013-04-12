@@ -10,7 +10,7 @@ Public Const EngineHeight As Integer = 600
 
 Private Const TileBufferSize As Integer = 2
 
-Private Enum IsometricType
+Public Enum IsometricType
     Normal
     NormalRotation
     IsometricBase
@@ -102,14 +102,14 @@ Public AddtoUserPos As structPositionInt
 Public playerCharIndex As Integer
 
 'Quad Draw
-Public RenderRect As Rect
+Public RenderRect As RECT
 
 'FPS Count
 Public FramesPerSec As Integer
 Public FramesPerSecCounter  As Long
 
 ' Directx8 Fonts
-Private Type FontInfo
+Public Type FontInfo
     MainFont As DxVBLibA.D3DXFont
     MainFontDesc As IFont
     MainFontFormat As New StdFont
@@ -154,9 +154,9 @@ Public Declare Function GetTickCount Lib "kernel32" () As Long
 Public Declare Function QueryPerformanceFrequency Lib "kernel32" (lpFrequency As Currency) As Long
 Public Declare Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCount As Currency) As Long
 
-Private Declare Function GetWindowRect Lib "user32.dll" (ByVal hWnd As Long, ByRef Rect As Rect) As Long
-Private Declare Function GetClientRect Lib "user32.dll" (ByVal hWnd As Long, ByRef Rect As Rect) As Long
-Private Declare Function SetWindowPos Lib "user32.dll" (ByVal hWnd As Long, ByVal hwndafter As Long, ByVal X As Long, ByVal Y As Long, ByVal cx As Long, ByVal cy As Long, ByVal options As Long) As Long
+Private Declare Function GetWindowRect Lib "user32.dll" (ByVal hwnd As Long, ByRef RECT As RECT) As Long
+Private Declare Function GetClientRect Lib "user32.dll" (ByVal hwnd As Long, ByRef RECT As RECT) As Long
+Private Declare Function SetWindowPos Lib "user32.dll" (ByVal hwnd As Long, ByVal hwndafter As Long, ByVal X As Long, ByVal Y As Long, ByVal cx As Long, ByVal cy As Long, ByVal options As Long) As Long
 'Private Declare Function SetWindowLongA Lib "user32.dll" (ByVal hwnd As Long, ByVal nIndex As Long, ByVal newVal As Long) As Long
 'Private Declare Function GetWindowLongA Lib "user32.dll" (ByVal hwnd As Long, ByVal nIndex As Long) As Long
 
@@ -269,19 +269,20 @@ Public Sub showNextFrame()
     End If
 #End If
 
-    If (testCooperative = False) Then Exit Sub
-
-    With D3DDevice
+    'If (testCooperative = False) Then Exit Sub
+   If Not (GraphicalDevice.DeviceIsContextValid = DEVICE_CTX_VALID) Then Exit Sub
+   ' With D3DDevice
         
-        If MotionBlur = True And errMotion = False Then
-            .SetRenderTarget m_pDisplayTextureSurface, m_pDisplayZSurface, 0
-            .Clear 1, RenderRect, D3DCLEAR_TARGET Or D3DCLEAR_ZBUFFER, 0, 1#, 0
-        Else
-            .Clear 1, RenderRect, D3DCLEAR_TARGET Or D3DCLEAR_ZBUFFER, 0, 1#, 0
-        End If
+   '     If MotionBlur = True And errMotion = False Then
+   '         .SetRenderTarget m_pDisplayTextureSurface, m_pDisplayZSurface, 0
+   '         .Clear 1, RenderRect, D3DCLEAR_TARGET Or D3DCLEAR_ZBUFFER, 0, 1#, 0
+   '     Else
+   '         .Clear 1, RenderRect, D3DCLEAR_TARGET Or D3DCLEAR_ZBUFFER, 0, 1#, 0
+   '     End If
         
-            .BeginScene
-            
+   '         .BeginScene
+    GraphicalDevice.BeginScene RenderRect, CLEAR_STENCIL
+    
             #If ParticleEditor = 1 Then
                 If EditParticle = False Then
             #End If
@@ -303,212 +304,30 @@ Public Sub showNextFrame()
                         
                         'Render grhSelected
                         If frmMain.grhList.ListIndex + 1 > 0 Then
-                            deviceRenderTexture frmMain.grhList.ListIndex + 1, Mouse.X, Mouse.Y, BasicColor(), frmMain.cmbMode.ListIndex
+                            GraphicalDevice.renderTexture frmMain.grhList.ListIndex + 1, Mouse.X, Mouse.Y, BasicColor(), frmMain.cmbMode.ListIndex
                         End If
                     End If
                 #End If
                 
                 'Render Gui
                 If RenderGUI = True Then
-                    guiRender
+                    GraphicalDevice.guiRender
                 End If
                 
-                If MotionBlur = True And errMotion = False Then ResetMotionStates
+                If MotionBlur = True And errMotion = False Then GraphicalDevice.resetMotionStates
             
-            .EndScene
-        .Present RenderRect, ByVal 0&, 0, ByVal 0&
-
-    End With
+            '.EndScene
+        '.Present RenderRect, ByVal 0&, 0, ByVal 0&
+    GraphicalDevice.EndScene RenderRect, frmMain.hwnd
+    
+    'End With
     
     FramesPerSecCounter = FramesPerSecCounter + 1
     timerElapsedTime = gameGetElapsedTime()
     timerTicksPerFrame = timerElapsedTime * 0.018   ' Engine Speed
     
 End Sub
-Public Function testCooperative() As Boolean
 
-
-
-End Function
-Public Function engineInitializing(ByRef Top As Integer, ByRef Left As Integer, ByRef Width As Integer, ByRef Height As Integer, Frm As Form, Optional ByRef BitsPerPixel As Byte = 32, Optional ByRef Windowed As Boolean = True) As Boolean
-
-
-End Function
-Private Function engineInitializingInWindow(hWnd As Long, AdapterIndex As Long, DevType As CONST_D3DDEVTYPE, bTryFallbacks As Boolean) As Boolean
-   
-
-End Function
-Private Function engineInitializingInFullscreen(hWnd As Long, AdapterIndex As Long, modeIndex As Long, DevType As CONST_D3DDEVTYPE, bTryFallbacks As Boolean, BitsPerPixel As Byte) As Boolean
-    
-
-End Function
-
-Public Sub engineDeinitializing()
-
-End Sub
-
-Public Function initializeMotionBlur() As Boolean
-
-On Error GoTo errHandle
-
-    Dim TexSizeW As Integer, TexSizeH As Integer
-    
-    TexSizeW = 800: TexSizeH = 600
-
-    'Configure MotionBlur code
-    Set m_pDisplayTexture = D3DX.CreateTexture(D3DDevice, TexSizeW, TexSizeH, 1, D3DUSAGE_RENDERTARGET, DispMode.format, D3DPOOL_DEFAULT)
-    Set m_pDisplayZSurface = D3DDevice.CreateDepthStencilSurface(TexSizeW, TexSizeH, D3DFMT_D16, D3DMULTISAMPLE_NONE)
-    Set m_pBackBuffer = D3DDevice.GetRenderTarget()
-    Set m_pZBuffer = D3DDevice.GetDepthStencilSurface()
-    Set m_pDisplayTextureSurface = m_pDisplayTexture.GetSurfaceLevel(0)
-    
-    VertList(0).sX = -1: VertList(0).sY = -1
-    VertList(1).sX = RenderRect.Right: VertList(1).sY = -1
-    VertList(2).sX = -1: VertList(2).sY = RenderRect.Bottom
-    VertList(3).sX = RenderRect.Right: VertList(3).sY = RenderRect.Bottom
-    
-    VertList(0).rhw = 1: VertList(1).rhw = 1: VertList(2).rhw = 1: VertList(3).rhw = 1
-    
-    'Chose colors of Motion Blur
-    VertList(0).Color = D3DColorXRGB(255, 255, 255)
-    VertList(1).Color = D3DColorXRGB(255, 255, 255)
-    VertList(2).Color = D3DColorXRGB(255, 255, 255)
-    VertList(3).Color = D3DColorXRGB(255, 255, 255)
-    
-    'we need to adjust texcoords to factor in that we're not using ALL of the texture
-    VertList(0).tu = 0#: VertList(0).tv = 0#
-    VertList(1).tu = RenderRect.Right / TexSizeW: VertList(1).tv = 0#
-    VertList(2).tu = 0#: VertList(2).tv = RenderRect.Bottom / TexSizeH
-    VertList(3).tu = RenderRect.Right / TexSizeW: VertList(3).tv = RenderRect.Bottom / TexSizeH
-    
-    lBlurFactor = 10
-    
-    initializeMotionBlur = True
-    errMotion = False
-    
-    Exit Function
-
-errHandle:
-
-    initializeMotionBlur = False
-    errMotion = True
-
-End Function
-Public Sub deviceResetRenderStates()
-
-    With D3DDevice
-    
-        'Set the shader to be used
-        .SetVertexShader D3DFVF_XYZRHW Or D3DFVF_TEX2 Or D3DFVF_DIFFUSE Or D3DFVF_SPECULAR
-    
-        'Set the render states
-        .SetRenderState D3DRS_LIGHTING, False
-        '.SetRenderState D3DRS_AMBIENT, D3DColorXRGB(0.5, 0.5, 0.5)
-        
-        .SetRenderState D3DRS_INDEXVERTEXBLENDENABLE, 1
-        
-        'Alphas
-        .SetRenderState D3DRS_SRCBLEND, D3DBLEND_SRCALPHA
-        .SetRenderState D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA
-        .SetRenderState D3DRS_ALPHABLENDENABLE, True
-        .SetRenderState D3DRS_POINTSPRITE_ENABLE, 1            'For The Particle Engine
-        .SetRenderState D3DRS_POINTSCALE_ENABLE, 0             'Also For The Particle Engine
-        .SetTextureStageState 0, D3DTSS_ALPHAOP, D3DTOP_MODULATE
-
-        'Sets up properties for transparency.
-        '.SetRenderState D3DRS_ALPHAREF, 255
-        '.SetRenderState D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL
-        
-        .SetRenderState D3DRS_CULLMODE, D3DCULL_CCW 'NONE
-        .SetRenderState D3DRS_FILLMODE, D3DFILL_SOLID
-        
-        'Para mostrar los quads
-        If WireFrame Then
-            .SetRenderState D3DRS_FILLMODE, D3DFILL_WIREFRAME
-        End If
-        
-        .SetRenderState D3DRS_ZENABLE, False
-        .SetRenderState D3DRS_ZWRITEENABLE, False
-
-        'Particle engine settings
-        .SetRenderState D3DRS_POINTSPRITE_ENABLE, 1
-        .SetRenderState D3DRS_POINTSCALE_ENABLE, 0
-    
-        'Set the texture stage stats (filters)
-        .SetTextureStageState 0, D3DTSS_ALPHAOP, D3DTOP_MODULATE
-        .SetTextureStageState 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE
-        .SetTextureStageState 0, D3DTSS_ALPHAARG2, D3DTA_CURRENT
-        
-        .SetTextureStageState 0, D3DTSS_MAGFILTER, D3DTEXF_LINEAR
-        .SetTextureStageState 0, D3DTSS_MINFILTER, D3DTEXF_LINEAR
-        .SetTextureStageState 0, D3DTSS_ADDRESSU, D3DTADDRESS_CLAMP
-        .SetTextureStageState 0, D3DTSS_ADDRESSV, D3DTADDRESS_CLAMP
-
-        If ShowShader Then
-            .SetPixelShader cPixelShader
-        Else
-            .SetPixelShader 0
-        End If
-
-    End With
-    
-End Sub
-Private Sub ResetMotionStates()
-        
-        With D3DDevice
-        
-            If cPixelShader > 0 Then D3DDevice.SetPixelShader 0
-            
-            .SetRenderState D3DRS_FILLMODE, D3DFILL_SOLID
-            .SetRenderState D3DRS_CULLMODE, D3DCULL_CCW
-                
-            .SetRenderTarget m_pBackBuffer, m_pZBuffer, 0
-            .SetTexture 0, m_pDisplayTexture
-            .SetTextureStageState 0, D3DTSS_ALPHAARG1, D3DTA_TFACTOR
-            .SetRenderState D3DRS_TEXTUREFACTOR, D3DColorARGB(lBlurFactor, 255, 255, 255)
-            
-            .SetRenderState D3DRS_SRCBLEND, D3DBLEND_SRCALPHA
-            .SetRenderState D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA
-            .SetRenderState D3DRS_ALPHABLENDENABLE, True
-            
-            .SetRenderState D3DRS_CULLMODE, D3DCULL_NONE
-            .SetRenderState D3DRS_ZENABLE, 0
-                
-            .SetVertexShader (D3DFVF_XYZRHW Or D3DFVF_TEX1 Or D3DFVF_DIFFUSE Or D3DFVF_SPECULAR)
-            .DrawPrimitiveUP D3DPT_TRIANGLESTRIP, 2, VertList(0), Len(VertList(0))
-                
-            .SetRenderState D3DRS_CULLMODE, D3DCULL_CCW
-            .SetRenderState D3DRS_ZENABLE, 1
-            .SetRenderState D3DRS_SRCBLEND, D3DBLEND_SRCALPHA
-            .SetRenderState D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA
-            .SetRenderState D3DRS_ALPHABLENDENABLE, True
-            .SetTexture 0, Nothing
-            .SetTextureStageState 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE
-            
-        End With
-End Sub
-
-Public Function fontInitializing(ByRef Size As Byte) As Boolean
-    Dim I As Byte
-    
-    ReDim Preserve Font(1 To Size) As FontInfo
-    
-    ' Set configuration
-    For I = 1 To UBound(Font)
-        With Font(I)
-            .MainFontFormat.Name = GetVar(App.Path & "\Init\Fonts.ini", "Font" & CStr(I), "Name")
-            .MainFontFormat.Size = GetVar(App.Path & "\Init\Fonts.ini", "Font" & CStr(I), "Size")
-            .Color = D3DColorARGB(ReadField(1, GetVar(App.Path & "\Init\Fonts.ini", "Font" & CStr(I), "ARGB"), Asc("-")), _
-                                                  ReadField(2, GetVar(App.Path & "\Init\Fonts.ini", "Font" & CStr(I), "ARGB"), Asc("-")), _
-                                                  ReadField(3, GetVar(App.Path & "\Init\Fonts.ini", "Font" & CStr(I), "ARGB"), Asc("-")), _
-                                                  ReadField(4, GetVar(App.Path & "\Init\Fonts.ini", "Font" & CStr(I), "ARGB"), Asc("-")))
-    
-            Set .MainFontDesc = .MainFontFormat
-            Set .MainFont = D3DX.CreateFont(D3DDevice, .MainFontDesc.hFont)
-        End With
-    Next I
-    
-End Function
 Public Sub fontDeInitializing()
     Dim I As Byte
     
@@ -519,21 +338,12 @@ Public Sub fontDeInitializing()
     Next I
     
 End Sub
-Private Sub fontRender(ByRef Text As String, ByRef Index As Byte, _
+Private Sub fontRender(ByRef Text As String, ByRef index As Byte, _
                             ByRef X As Integer, ByRef Y As Integer, _
                             ByRef Width As Integer, ByRef Height As Integer, _
                             format As Long)
                             
-    Static fontRect As Rect 'This defines where it will be
-    
-    With fontRect
-        .Top = Y + RenderRect.Top
-        .Left = X + RenderRect.Left
-        .Bottom = Y + Height + RenderRect.Top
-        .Right = X + Width + RenderRect.Left
-    End With
-    
-    D3DX.DrawText Font(Index).MainFont, Font(Index).Color, Text, fontRect, format
+
 End Sub
 Public Sub Move(ByVal Direction As eDirection)
     
@@ -821,7 +631,7 @@ Private Sub mapRender(ByRef PixelOffset As structPositionSng)
                 tempY = mapPreCalcPos(lX, lY).Y - UserPos.Y * TilePixelHeight + offY
                 
                 'Layer 1 **********************************
-                deviceRenderTexture mapData(lX, lY).Layer(1).GrhIndex, _
+                GraphicalDevice.renderTexture mapData(lX, lY).Layer(1).GrhIndex, _
                                     tempX, tempY, _
                                     mapData(lX, lY).LightColor(), _
                                     IsometricType.IsometricBase
@@ -829,7 +639,7 @@ Private Sub mapRender(ByRef PixelOffset As structPositionSng)
                 
                 'Layer 2 **********************************
                 If mapData(lX, lY).Layer(2).GrhIndex > 0 Then
-                    deviceRenderTexture mapData(lX, lY).Layer(2).GrhIndex, _
+                    GraphicalDevice.renderTexture mapData(lX, lY).Layer(2).GrhIndex, _
                                     tempX, tempY, _
                                     mapData(lX, lY).LightColor(), _
                                     IsometricType.IsometricBase
@@ -848,7 +658,7 @@ Private Sub mapRender(ByRef PixelOffset As structPositionSng)
         
                 'Layer 3 **********************************
                 If mapData(lX, lY).Layer(3).GrhIndex > 0 Then
-                    deviceRenderTexture mapData(lX, lY).Layer(3).GrhIndex, _
+                    GraphicalDevice.renderTexture mapData(lX, lY).Layer(3).GrhIndex, _
                                     tempX, tempY, _
                                     mapData(lX, lY).LightColor(), _
                                     IsometricType.Normal
@@ -867,7 +677,7 @@ Private Sub mapRender(ByRef PixelOffset As structPositionSng)
                 'ParticleLayer ****************************
                 If mapData(lX, lY).particleIndex > 0 Then
                     UpdateParticleGroup mapData(lX, lY).particleIndex, tempX, tempY
-                    RenderParticleGroup mapData(lX, lY).particleIndex
+                    GraphicalDevice.renderParticleGroup mapData(lX, lY).particleIndex
                 End If
                 '******************************************
         
@@ -876,98 +686,14 @@ Private Sub mapRender(ByRef PixelOffset As structPositionSng)
        
        
     'Set DeviceStates
-    deviceResetRenderStates
+    GraphicalDevice.resetRenderStates 'GDK: Necesario¿?
         
     'Render HUD
-    deviceRenderTexture 10, 0, 484, BasicColor(), IsometricType.Normal
+    GraphicalDevice.renderTexture 10, 0, 484, BasicColor(), IsometricType.Normal
     
 End Sub
-Private Sub deviceRenderBox(X1 As Single, Y1 As Single, X2 As Single, Y2 As Single, _
-                            Optional ByVal v1 As Long = -1, Optional ByVal v2 As Long = -1, _
-                            Optional ByVal v3 As Long = -1, Optional ByVal v4 As Long = -1)
 
-    Dim myVertex(3) As D3DTLVERTEX
-
-        myVertex(0) = setVertex(X1, Y1 + X2, 0, 1, v1, 0, 0, 0)
-        myVertex(1) = setVertex(X1, Y1, 0, 1, v2, 0, 1, 0)
-        myVertex(2) = setVertex(X1 + Y2, Y1 + X2, 0, 1, v3, 0, 0, 1)
-        myVertex(3) = setVertex(X1 + Y2, Y1, 0, 1, v4, 0, 1, 1)
-
-    D3DDevice.SetTexture 0, Nothing
-    D3DDevice.DrawPrimitiveUP D3DPT_TRIANGLESTRIP, 2, myVertex(0), Len(myVertex(0))
-
-End Sub
-Private Sub RenderParticleGroup(grIndex As Integer)
-
-    With D3DDevice
-    
-        ' Set the render states for using point sprites
-        .SetRenderState D3DRS_POINTSPRITE_ENABLE, 1 'True
-        .SetRenderState D3DRS_POINTSCALE_ENABLE, 0 'True
-        .SetRenderState D3DRS_POINTSIZE, ParticleGroup(grIndex).lngFloatSize
-        .SetRenderState D3DRS_POINTSIZE_MIN, ParticleGroup(grIndex).lngFloat0
-        .SetRenderState D3DRS_POINTSCALE_A, ParticleGroup(grIndex).lngFloat0
-        .SetRenderState D3DRS_POINTSCALE_B, ParticleGroup(grIndex).lngFloat0
-        .SetRenderState D3DRS_POINTSCALE_C, ParticleGroup(grIndex).lngFloat1
-        .SetRenderState D3DRS_SRCBLEND, D3DBLEND_SRCALPHA
-        .SetRenderState D3DRS_DESTBLEND, D3DBLEND_ONE
-        .SetRenderState D3DRS_ALPHABLENDENABLE, 1
-         
-        ' Set our texture
-        #If LoadingMetod = 0 Then
-            .SetTexture 0, oGraphic(lKeys(Grh(ParticleGroup(grIndex).myTextureGrh).FileNum)).D3DTexture
-        #Else
-        
-        Static tSurface As tempTexture
-        
-        Set tSurface.Surface = getSurface(Grh(ParticleGroup(grIndex).myTextureGrh).FileNum, tSurface.Width, tSurface.Height)
-        
-        .SetTexture 0, tSurface.Surface
-        #End If
-        
-        ' And draw all our particles :D
-        .DrawPrimitiveUP D3DPT_POINTLIST, ParticleGroup(grIndex).ParticleCounts, _
-            ParticleGroup(grIndex).vertsPoints(0), Len(ParticleGroup(grIndex).vertsPoints(0))
-            
-    End With
-    
-End Sub
-Private Sub deviceRenderTexture(ByRef GrhIndex As Long, ByRef cx As Single, ByRef cy As Single, ByRef Color() As Long, ByRef Iso As IsometricType, Optional ByRef Angle As Single = 0)
-        
-    #If LoadingMetod = 0 Then
-    
-    If textureLoad(GrhIndex) = False Then Exit Sub
-    
-    If Not oGraphic(lKeys(Grh(GrhIndex).FileNum)).D3DTexture Is Nothing Then
-        GeometryBoxType Grh(GrhIndex), cx, cy, Vector, Color(), Iso, Angle
-    End If
-               
-    D3DDevice.SetTexture 0, oGraphic(lKeys(Grh(GrhIndex).FileNum)).D3DTexture
-        
-    #Else
-    
-    Static d3dSurface As tempTexture
-    
-    Set d3dSurface.Surface = getSurface(Grh(GrhIndex).FileNum, d3dSurface.Width, d3dSurface.Height)
-    
-    If Not d3dSurface.Surface Is Nothing Then
-        GeometryBoxType Grh(GrhIndex), cx, cy, Vector, Color(), Iso, Angle
-    End If
-    
-    D3DDevice.SetTexture 0, d3dSurface.Surface
-    
-    #End If
-        
-    '##RENDERING METHOD 1## - Medium Faster
-    'D3DDevice.DrawPrimitiveUP D3DPT_TRIANGLESTRIP, 2, Vector(0), Len(Vector(0))
-                
-    '##RENDERING METHOD 2## - Faster
-    D3DDevice.DrawIndexedPrimitiveUP D3DPT_TRIANGLESTRIP, 0, 4, 2, _
-            indexList(0), D3DFMT_INDEX16, _
-            Vector(0), Len(Vector(0))
-                
-End Sub
-Private Function GeometryBoxType(ByRef Grh As structGrhData, ByRef cx As Single, ByRef cy As Single, vertex() As D3DTLVERTEX, ByRef Color() As Long, ByRef Iso As IsometricType, Optional ByRef Angle As Single = 0)
+Public Function GeometryBoxType(ByRef Grh As structGrhData, ByRef cx As Single, ByRef cy As Single, vertex() As D3DTLVERTEX, ByRef Color() As Long, ByRef Iso As IsometricType, Optional ByRef Angle As Single = 0)
 
         Select Case Iso
             Case IsometricType.Normal
@@ -1044,13 +770,6 @@ Public Function setVertex(ByRef X As Single, ByRef Y As Single, ByRef z As Singl
         .tv = tv
     End With
     
-End Function
-Public Function FloatToDWord(flo As Single) As Long
-'A helper function, converts from C++ Float to C++ DWord
-    Dim buf As D3DXBuffer
-    Set buf = D3DX.CreateBuffer(4)
-    D3DX.BufferSetData buf, 0, 4, 1, flo
-    D3DX.BufferGetData buf, 0, 4, 1, FloatToDWord
 End Function
 
 

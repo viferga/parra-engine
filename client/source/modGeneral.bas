@@ -2,6 +2,8 @@ Attribute VB_Name = "modGeneral"
 Option Explicit
 
 Public GraphicalDevice As clsGraphicalDevice
+Public GraphicalApi As Byte
+
 Public Mouse As structPositionSng
 
 Public generalIP As String
@@ -40,7 +42,14 @@ Sub main()
     MotionBlur = False
     
     gamePaused = True
+    GraphicalApi = 1
     
+    '//Set the Api to render
+    If GraphicalApi = 1 Then
+        Set GraphicalDevice = New clsGraphicDirectX8
+    'ElseIf GraphicalApi = 0 Then
+        'Set graphivaldevice = new clsGraphicOGL
+    End If
     'bRunning is true if TileEninge initialize correctly
     bRunning = GraphicalDevice.Initialize(0, 0, 800, 600, frmMain, 16, True)   '553
     

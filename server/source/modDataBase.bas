@@ -59,7 +59,7 @@ Private Function getConnString(ByRef Index As Byte) As String
     Path = App.Path & "\server.ini"
 
     getConnString = "Provider=MSDASQL.1;Password=;Persist Security Info=True;User ID=;Extended Properties=" & Chr$(34) & _
-                    "DRIVER={MySQL ODBC 5.1 Driver};" & _
+                    "DRIVER={MySQL ODBC 3.51 Driver};" & _
                     "DESC=;" & _
                     "SERVER=" & GetVar(Path, "SQL" & CStr(Index), "server") & ";" & _
                     "DATABASE=" & GetVar(Path, "SQL" & CStr(Index), "dbname") & ";" & _

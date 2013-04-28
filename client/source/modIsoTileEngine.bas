@@ -79,7 +79,7 @@ Public Type Character
     FX As structGrh
     FXIndex As Integer
         
-    Name As String
+    name As String
     
     Moving As Byte
     scrollDirection As structPositionInt
@@ -154,9 +154,9 @@ Public Declare Function GetTickCount Lib "kernel32" () As Long
 Public Declare Function QueryPerformanceFrequency Lib "kernel32" (lpFrequency As Currency) As Long
 Public Declare Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCount As Currency) As Long
 
-Private Declare Function GetWindowRect Lib "user32.dll" (ByVal hwnd As Long, ByRef RECT As RECT) As Long
-Private Declare Function GetClientRect Lib "user32.dll" (ByVal hwnd As Long, ByRef RECT As RECT) As Long
-Private Declare Function SetWindowPos Lib "user32.dll" (ByVal hwnd As Long, ByVal hwndafter As Long, ByVal X As Long, ByVal Y As Long, ByVal cx As Long, ByVal cy As Long, ByVal options As Long) As Long
+Private Declare Function GetWindowRect Lib "user32.dll" (ByVal hWnd As Long, ByRef RECT As RECT) As Long
+Private Declare Function GetClientRect Lib "user32.dll" (ByVal hWnd As Long, ByRef RECT As RECT) As Long
+Private Declare Function SetWindowPos Lib "user32.dll" (ByVal hWnd As Long, ByVal hwndafter As Long, ByVal X As Long, ByVal Y As Long, ByVal cx As Long, ByVal cy As Long, ByVal options As Long) As Long
 'Private Declare Function SetWindowLongA Lib "user32.dll" (ByVal hwnd As Long, ByVal nIndex As Long, ByVal newVal As Long) As Long
 'Private Declare Function GetWindowLongA Lib "user32.dll" (ByVal hwnd As Long, ByVal nIndex As Long) As Long
 
@@ -281,7 +281,7 @@ Public Sub showNextFrame()
    '     End If
         
    '         .BeginScene
-    GraphicalDevice.BeginScene RenderRect, CLEAR_STENCIL
+    GraphicalDevice.BeginScene RenderRect, CLEAR_FLAGS.CLEAR_COLOR
     
             #If ParticleEditor = 1 Then
                 If EditParticle = False Then
@@ -318,7 +318,7 @@ Public Sub showNextFrame()
             
             '.EndScene
         '.Present RenderRect, ByVal 0&, 0, ByVal 0&
-    GraphicalDevice.EndScene RenderRect, frmMain.hwnd
+    GraphicalDevice.EndScene RenderRect, frmMain.hWnd
     
     'End With
     

@@ -89,9 +89,15 @@ Public Sub meteoChangeStatus(ByVal fxStat As meteoState)
     End Select
     
 End Sub
+<<<<<<< HEAD
 Private Function GetParticleInfo(index As Integer, ByVal Data As String) As Single
 
     GetParticleInfo = CSng(GetVar(App.Path & "\Init\particle.ini", CStr(index), Data))
+=======
+Private Function GetParticleInfo(index As Integer, ByVal data As String) As Single
+
+    GetParticleInfo = CSng(GetVar(App.Path & "\Init\particle.ini", CStr(index), data))
+>>>>>>> parra_branch
 
 End Function
 Public Sub loadParticleGroup()

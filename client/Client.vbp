@@ -23,12 +23,19 @@ Module=modProtocol; source\Protocol.bas
 Class=clsLoaderMP3; source\clsSoundMP3.cls
 Class=clsSocket; source\Socket.cls
 <<<<<<< HEAD
+<<<<<<< HEAD
 Module=modSaveConfig; source\modSaveConfig.bas
 =======
 Class=clsGraphicalDevice; source\clsGraphicalDevice.cls
 Class=clsGraphicDirectX8; source\clsGraphicDirectX8.cls
 Module=modCreateWindows; source\modCreateWindows.bas
 >>>>>>> godker_branch
+=======
+Class=clsGraphicalDevice; source\clsGraphicalDevice.cls
+Class=clsGraphicDirectX8; source\clsGraphicDirectX8.cls
+Module=modCreateWindows; source\modCreateWindows.bas
+Class=clsAllocator; source\clsAllocator.cls
+>>>>>>> parra_branch
 Startup="Sub Main"
 HelpFile=""
 Title="Client"

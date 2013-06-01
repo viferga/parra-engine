@@ -177,7 +177,7 @@ Dim strTemp As String
             Call PostQuitMessage(0&)
         
         Case WM_SETCURSOR
-            SetCursor hCursor
+            'SetCursor hCursor
         
         
     End Select

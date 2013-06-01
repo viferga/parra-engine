@@ -21,6 +21,7 @@ Class=clsSocket; source\Socket.cls
 Class=clsGraphicalDevice; source\clsGraphicalDevice.cls
 Class=clsGraphicDirectX8; source\clsGraphicDirectX8.cls
 Module=modCreateWindows; source\modCreateWindows.bas
+Class=clsAllocator; source\clsAllocator.cls
 Startup="Sub Main"
 HelpFile=""
 Title="Client"

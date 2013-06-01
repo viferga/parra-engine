@@ -1,6 +1,10 @@
 Attribute VB_Name = "modGeneral"
 Option Explicit
 
+Public Instance As Byte '0 =Conectar ; 1=Account ; 2=Conectado
+Public GraphicalDevice As clsGraphicalDevice
+Public GraphicalApi As Byte
+
 Public Mouse As structPositionSng
 
 Public generalIP As String
@@ -15,14 +19,14 @@ Public Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
 Private Declare Function GetKeyState Lib "user32" (ByVal nVirtKey As Long) As Long
 
 'MouseInput
-Private Type PointAPI
-    x As Long
-    y As Long
+Private Type POINTAPI
+    X As Long
+    Y As Long
 End Type
 
 'Private Declare Function GetCursorPos Lib "user32" (lpPoint As PointAPI) As Long
 Private Declare Function GetActiveWindow Lib "user32" () As Long
-Public Declare Function SetWindowPos Lib "user32" (ByVal hwnd As Long, ByVal hWndInsertAfter As Long, ByVal x As Long, ByVal y As Long, ByVal cx As Long, ByVal cy As Long, ByVal wFlags As Long) As Long
+Public Declare Function SetWindowPos Lib "user32" (ByVal hwnd As Long, ByVal hWndInsertAfter As Long, ByVal X As Long, ByVal Y As Long, ByVal cx As Long, ByVal cy As Long, ByVal wFlags As Long) As Long
 Sub main()
 
     IntializeRandom
@@ -34,14 +38,24 @@ Sub main()
     frmMain.Show
     frmMain.Visible = False
     
+    'Instance = 0
+    'CreateForms
+    
     loadConnectionInfo generalIP, generalPort
     
     MotionBlur = False
     
     gamePaused = True
+    GraphicalApi = 1
     
+    '//Set the Api to render
+    If GraphicalApi = 1 Then
+        Set GraphicalDevice = New clsGraphicDirectX8
+    'ElseIf GraphicalApi = 0 Then
+        'Set graphivaldevice = new clsGraphicOGL
+    End If
     'bRunning is true if TileEninge initialize correctly
-    bRunning = engineInitializing(0, 0, 800, 600, frmMain, 16, True)   '553
+    bRunning = GraphicalDevice.Initialize(0, 0, 800, 600, frmMain, 16, True)   '553
     
     'Load MapData
     mapLoadAll
@@ -64,7 +78,7 @@ Sub main()
     mapUnloadAll
     
     'Deinit engine
-    engineDeinitializing
+    GraphicalDevice.DeInitialize
     
     'Stop Audio
     Sound_Destroy
@@ -257,7 +271,7 @@ Private Sub gameCheckRoutineKeys()
         End If
         
         If GetKeyState(vbKeyS) < 0 Then
-            ShowShader = Not ShowShader
+            'ShowShader = Not ShowShader
             Exit Sub
         End If
         

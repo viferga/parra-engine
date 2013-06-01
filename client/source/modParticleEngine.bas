@@ -89,9 +89,9 @@ Public Sub meteoChangeStatus(ByVal fxStat As meteoState)
     End Select
     
 End Sub
-Private Function GetParticleInfo(Index As Integer, ByVal Data As String) As Single
+Private Function GetParticleInfo(index As Integer, ByVal Data As String) As Single
 
-    GetParticleInfo = CSng(GetVar(App.Path & "\Init\particle.ini", CStr(Index), Data))
+    GetParticleInfo = CSng(GetVar(App.Path & "\Init\particle.ini", CStr(index), Data))
 
 End Function
 Public Sub loadParticleGroup()
@@ -107,9 +107,9 @@ Public Sub loadParticleGroup()
         ParticleGroup(I).ParticleCounts = GetParticleInfo(CStr(I), "pCount")
         ParticleGroup(I).myTextureGrh = GetParticleInfo(CStr(I), "TextureGrh")
         
-        #If LoadingMetod = 0 Then
-            If textureLoad(ParticleGroup(I).myTextureGrh) = False Then MsgBox "Error: Cargando las texturas de las particulas", vbCritical
-        #End If
+        '#If LoadingMetod = 0 Then
+        '    If textureLoad(ParticleGroup(I).myTextureGrh) = False Then MsgBox "Error: Cargando las texturas de las particulas", vbCritical
+        '#End If
         
         Begin I
         
@@ -124,9 +124,9 @@ Private Sub Begin(grIndex As Integer)
     With ParticleGroup(grIndex)
     
         
-        .lngFloat0 = FloatToDWord(GetParticleInfo(CStr(grIndex), "FloatA"))
-        .lngFloat1 = FloatToDWord(GetParticleInfo(CStr(grIndex), "FloatB"))
-        .lngFloatSize = FloatToDWord(GetParticleInfo(CStr(grIndex), "Size")) ' Size of our flame particles..
+        .lngFloat0 = GraphicalDevice.FloatToDWord(GetParticleInfo(CStr(grIndex), "FloatA"))
+        .lngFloat1 = GraphicalDevice.FloatToDWord(GetParticleInfo(CStr(grIndex), "FloatB"))
+        .lngFloatSize = GraphicalDevice.FloatToDWord(GetParticleInfo(CStr(grIndex), "Size")) ' Size of our flame particles..
          
         ' Redim our particles to the particlecount
         ReDim .Particles(0 To .ParticleCounts)

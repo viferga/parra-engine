@@ -78,27 +78,27 @@ End Sub
 Private Sub HandleIncomingAccount(ByRef sckIndex As Integer)
 
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim Buffer As New clsByteQueue
+    Dim buffer As New clsByteQueue
     
-    Call Buffer.CopyBuffer(socketList(sckIndex).incomingData)
+    Call buffer.CopyBuffer(socketList(sckIndex).incomingData)
     
     'Remove packet ID
-    Buffer.ReadByte
+    buffer.ReadByte
 
     'Leemos paquete identificador
     
     Dim bytePacket As Byte
-    Dim AccountName As String, accountPassword As String, accountMail As String
+    Dim accountName As String, accountPassword As String, accountMail As String
     
-    bytePacket = Buffer.ReadByte()
+    bytePacket = buffer.ReadByte()
     
         Select Case bytePacket
         
             Case 1
-               AccountName = Buffer.ReadASCIIString()
-               accountPassword = Buffer.ReadASCIIString()
+               accountName = buffer.ReadASCIIString()
+               accountPassword = buffer.ReadASCIIString()
                
-               If accountConnect(AccountName, accountPassword) = False Then
+               If accountConnect(accountName, accountPassword) = False Then
                     HandleSendMessage sckIndex, MessageType.MessageBox, "Error: no se ha podido conectar la cuenta."
                     DoEvents
                     sckClose sckIndex
@@ -107,20 +107,20 @@ Private Sub HandleIncomingAccount(ByRef sckIndex As Integer)
                End If
             
             Case 2
-               AccountName = Buffer.ReadASCIIString()
-               accountPassword = Buffer.ReadASCIIString()
-               accountMail = Buffer.ReadASCIIString()
+               accountName = buffer.ReadASCIIString()
+               accountPassword = buffer.ReadASCIIString()
+               accountMail = buffer.ReadASCIIString()
                
-               If accountCreate(AccountName, accountPassword, accountMail) = False Then
+               If accountCreate(accountName, accountPassword, accountMail) = False Then
                     HandleSendMessage sckIndex, MessageType.MessageBox, "Error: no se ha podido crear la cuenta."
                End If
                
             Case 3
-               AccountName = Buffer.ReadASCIIString()
-               accountPassword = Buffer.ReadASCIIString()
-               accountMail = Buffer.ReadASCIIString()
+               accountName = buffer.ReadASCIIString()
+               accountPassword = buffer.ReadASCIIString()
+               accountMail = buffer.ReadASCIIString()
                
-               If accountKill(AccountName, accountPassword, accountMail) = False Then
+               If accountKill(accountName, accountPassword, accountMail) = False Then
                     HandleSendMessage sckIndex, MessageType.MessageBox, "Error: no se ha podido borrar la cuenta."
                End If
                
@@ -133,7 +133,7 @@ Private Sub HandleIncomingAccount(ByRef sckIndex As Integer)
 
     
     'If we got here then packet is complete, copy data back to original queue
-    Call socketList(sckIndex).incomingData.CopyBuffer(Buffer)
+    Call socketList(sckIndex).incomingData.CopyBuffer(buffer)
     
     'Write Log in Client
     Call socketList(sckIndex).outgoingData.WriteByte(ServerPacketID.AccountEvents)
@@ -159,25 +159,25 @@ End Sub
 Private Sub HandleIncomingUser(ByRef sckIndex As Integer)
 
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim Buffer As New clsByteQueue
+    Dim buffer As New clsByteQueue
     
-    Call Buffer.CopyBuffer(socketList(sckIndex).incomingData)
+    Call buffer.CopyBuffer(socketList(sckIndex).incomingData)
     
     'Remove packet ID
-    Buffer.ReadByte
+    buffer.ReadByte
     
     'Leemos paquete identificador
     
     Dim bytePacket As Byte
     
-        bytePacket = Buffer.ReadByte()
+        bytePacket = buffer.ReadByte()
     
         Select Case bytePacket
             Case 1 'login
 
                Dim playerName As String
     
-               playerName = Buffer.ReadASCIIString()
+               playerName = buffer.ReadASCIIString()
     
                If playerConnect(sckIndex, playerName) = False Then
                     HandleSendMessage sckIndex, MessageType.MessageBox, "Error: el personaje no existe."
@@ -198,7 +198,7 @@ Private Sub HandleIncomingUser(ByRef sckIndex As Integer)
         End Select
     
     'If we got here then packet is complete, copy data back to original queue
-    Call socketList(sckIndex).incomingData.CopyBuffer(Buffer)
+    Call socketList(sckIndex).incomingData.CopyBuffer(buffer)
     
     'Write Log in Client
     Call socketList(sckIndex).outgoingData.WriteByte(ServerPacketID.UserEvents)
@@ -212,34 +212,35 @@ Private Sub HandleIncomingUser(ByRef sckIndex As Integer)
     
 End Sub
 Private Sub HandleIncomingChar(ByRef sckIndex As Integer)
+'GDK: no veo ningun string por aca
 
     'This packet contains strings, make a copy of the data to prevent losses if it's not complete yet...
-    Dim Buffer As New clsByteQueue
+    Dim buffer As New clsByteQueue
     
-    Call Buffer.CopyBuffer(socketList(sckIndex).incomingData)
+    Call buffer.CopyBuffer(socketList(sckIndex).incomingData)
     
     'Remove packet ID
-    Buffer.ReadByte
+    buffer.ReadByte
     
     Dim bytePacket As Byte
-    Dim charIndex As Integer
+    Dim CharIndex As Integer
     Dim charType As characterType
     
     'Leemos paquete identificador
-    bytePacket = Buffer.ReadByte()
+    bytePacket = buffer.ReadByte()
         
-    charIndex = Buffer.ReadInteger()
-    charType = Buffer.ReadByte()
+    CharIndex = buffer.ReadInteger()
+    charType = buffer.ReadByte()
         
     
-        charIndex = Buffer.ReadInteger()
+   '     CharIndex = buffer.ReadInteger() 2 veces xD GDK
     
         Select Case bytePacket
             Case 1 'charactermove
                 Dim Direction As characterDirection
                 
-                Direction = Buffer.ReadByte()
-                characterMove charIndex, charType, Direction
+                Direction = buffer.ReadByte()
+                characterMove CharIndex, charType, Direction
                 
             Case 2
             
@@ -253,7 +254,7 @@ Private Sub HandleIncomingChar(ByRef sckIndex As Integer)
         End Select
     
     'If we got here then packet is complete, copy data back to original queue
-    Call socketList(sckIndex).incomingData.CopyBuffer(Buffer)
+    Call socketList(sckIndex).incomingData.CopyBuffer(buffer)
         
 End Sub
 

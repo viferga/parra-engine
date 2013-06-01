@@ -42,6 +42,7 @@ End Enum
 Public Enum ClientPacketID
     AccountEvents = 1
     UserEvents
+    CharEvents
 End Enum
 
 ' Handles incoming data.
@@ -70,6 +71,7 @@ Public Sub HandleIncomingData()
                 Else
                     HandleIncomingCharacterRemove
                 End If
+        
                 
         Case Else: Exit Sub
     End Select
@@ -94,13 +96,13 @@ Private Sub HandleIncomingAccount()
         
             Case 1 'Connect
                 
-                Dim NumPlayers As Byte, i As Long
+                Dim NumPlayers As Byte, I As Long
                 
                 NumPlayers = incomingData.ReadByte
                 
-                For i = 1 To NumPlayers
+                For I = 1 To NumPlayers
                     frmConnect.lstPlayers.AddItem incomingData.ReadASCIIString()
-                Next i
+                Next I
             
                 frmConnect.lstPlayers.Visible = True
                 
@@ -178,12 +180,14 @@ Private Sub HandleIncomingMessage()
         
 End Sub
 Private Sub HandleIncomingCharacterCreate()
+
+    'Remove packet ID
     
-        Dim CharIndex As Integer
-        CharIndex = incomingData.ReadInteger()
+        Dim charindex As Integer
+        charindex = incomingData.ReadInteger()
         
         If charLast > 0 Then
-            If CharIndex > charLast Then charLast = CharIndex
+            If charindex > charLast Then charLast = charindex
             ReDim Preserve characterList(1 To charLast) As Character
         Else
             ReDim characterList(1) As Character
@@ -191,7 +195,7 @@ Private Sub HandleIncomingCharacterCreate()
         End If
             
         
-        With characterList(CharIndex)
+        With characterList(charindex)
             
             .Name = incomingData.ReadASCIIString()
             .Body = incomingData.ReadInteger()
@@ -201,7 +205,7 @@ Private Sub HandleIncomingCharacterCreate()
             .Pos.Y = incomingData.ReadByte()
             
             If .Name = frmConnect.UserName Then
-                playerCharIndex = CharIndex
+                playerCharIndex = charindex
                 
                 UserPos.X = .Pos.X
                 UserPos.Y = .Pos.Y
@@ -214,23 +218,23 @@ Private Sub HandleIncomingCharacterCreate()
 End Sub
 
 Private Sub HandleIncomingCharacterRemove()
-    
-    Dim CharIndex As Integer
-    CharIndex = incomingData.ReadInteger()
 
-    With characterList(CharIndex)
+    Dim charindex As Integer
+    charindex = incomingData.ReadInteger()
+
+    With characterList(charindex)
     
         .Active = 0
         
         'Update lastchar
-        If CharIndex = charLast Then
+        If charindex = charLast Then
             Do Until .Active = 1
                 charLast = charLast - 1
                 If charLast = 0 Then Exit Do
             Loop
         End If
         
-        mapData(.Pos.X, .Pos.Y).CharIndex = 0
+        mapData(.Pos.X, .Pos.Y).charindex = 0
 
         .Body = 0
         .FXIndex = 0
@@ -250,6 +254,7 @@ Private Sub HandleIncomingCharacterRemove()
         ReDim characterList(0) As Character
     End If
 End Sub
+
 Public Sub WriteOutgoingData(ByRef Packed As ClientPacketID)
 
     outgoingData.WriteByte Packed
@@ -262,6 +267,10 @@ Public Sub WriteOutgoingData(ByRef Packed As ClientPacketID)
         Case ClientPacketID.UserEvents
             WriteOutgoingUser
             Exit Sub
+        
+        'Case ClientPacketID.CharEvents 'lo iva a poner aca pero habia que agregar algunos parametros, asi q mejor no GDK
+        '    WriteCharEvents
+        '    Exit Sub
             
         Case Else: Exit Sub
         
@@ -331,6 +340,22 @@ Private Sub WriteOutgoingUser()
     End With
             
 End Sub
+Public Sub WriteCharEvents(bytepacket As Byte, charindex As Integer, chartype As characterType)
+
+    With outgoingData 'Enviamos
+        .WriteByte bytepacket 'tipo del paquete - accion -
+        .WriteInteger charindex 'index del char
+        .WriteByte chartype 'tipo del char - npc o player -
+    
+        Select Case bytepacket
+            Case 1
+                .WriteByte characterList(charindex).Heading 'no estoy seguro, pero asi deberia funcionar
+                
+        End Select
+    End With
+    
+End Sub
+
 Public Sub SendBuffer()
     
     With outgoingData

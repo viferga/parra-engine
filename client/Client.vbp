@@ -1,12 +1,15 @@
 Type=Exe
 Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\Windows\SysWOW64\stdole2.tlb#OLE Automation
+<<<<<<< HEAD
 Reference=*\G{E1211242-8E94-11D1-8808-00C04FC2C603}#1.0#0#..\..\Windows\SysWOW64\DX8VB.DLL#DirectX 8 for Visual Basic Type Library
+=======
+Reference=*\G{E1211242-8E94-11D1-8808-00C04FC2C603}#1.0#0#..\..\Windows\SysWow64\DX8VB.DLL#DirectX 8 for Visual Basic Type Library
+>>>>>>> godker_branch
 Reference=*\G{56A868B0-0AD4-11CE-B03A-0020AF0BA770}#1.0#0#..\..\Windows\SysWow64\quartz.dll#ActiveMovie control type library
 Form=source\frmMain.frm
 Form=source\frmConnect.frm
 Module=modAudio; source\modAudio.bas
 Module=modGeneral; source\modGeneral.bas
-Module=modGraphicsLoader; source\modGraphicsLoader.bas
 Module=modGui; source\modGui.bas
 Module=modHelper; source\modHelper.bas
 Class=clsByteQueue; source\clsByteQueue.cls
@@ -15,12 +18,17 @@ Module=modLights; source\modLights.bas
 Module=modMap; source\modMap.bas
 Module=modParticle; source\modParticleEngine.bas
 Module=modPhysics; source\modPhysics.bas
-Module=modPixelShader; source\modPixelShader.bas
 Module=modSocket; source\modSocket.bas
 Module=modProtocol; source\Protocol.bas
 Class=clsLoaderMP3; source\clsSoundMP3.cls
 Class=clsSocket; source\Socket.cls
+<<<<<<< HEAD
 Module=modSaveConfig; source\modSaveConfig.bas
+=======
+Class=clsGraphicalDevice; source\clsGraphicalDevice.cls
+Class=clsGraphicDirectX8; source\clsGraphicDirectX8.cls
+Module=modCreateWindows; source\modCreateWindows.bas
+>>>>>>> godker_branch
 Startup="Sub Main"
 HelpFile=""
 Title="Client"

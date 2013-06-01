@@ -7,7 +7,7 @@ Attribute VB_Name = "modVideoInitialize"
 '  Content:    VB D3DFramework global initialization module
 '
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
+ 
 ' DOC:  Use with
 ' DOC:        D3DAnimation.cls
 ' DOC:        D3DFrame.cls
@@ -24,7 +24,6 @@ Attribute VB_Name = "modVideoInitialize"
 ' DOC:        D3DUtil_ResizeWindowed        resize for windowed modes
 ' DOC:        D3DUtil_ResizeFullscreen      resize to fullscreen mode
 ' DOC:        D3DUtil_CreateTextureInPool   create a texture
-
 Option Explicit
 
 

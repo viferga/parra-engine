@@ -1,7 +1,6 @@
 Type=Exe
-Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\WINDOWS\system32\stdole2.tlb#OLE Automation
-Reference=*\G{00025E01-0000-0000-C000-000000000046}#4.0#0#..\..\Archivos de programa\Archivos comunes\Microsoft Shared\DAO\DAO350.DLL#Microsoft DAO 3.51 Object Library
-Reference=*\G{00000200-0000-0010-8000-00AA006D2EA4}#2.0#0#..\..\Archivos de programa\Archivos comunes\system\ado\msado20.tlb#Microsoft ActiveX Data Objects 2.0 Library
+Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\Windows\SysWOW64\stdole2.tlb#OLE Automation
+Reference=*\G{00000200-0000-0010-8000-00AA006D2EA4}#2.0#0#..\..\Program Files (x86)\Common Files\System\ado\msado20.tlb#Microsoft ActiveX Data Objects 2.0 Library
 Object={248DD890-BB45-11CF-9ABC-0080C7E7B78D}#1.0#0; MSWINSCK.OCX
 Form=source\frmMain.frm
 Module=modAccount; source\modAccount.bas

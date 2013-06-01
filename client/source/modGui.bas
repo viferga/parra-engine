@@ -21,6 +21,9 @@ Public Type structBox
     Text As String
     TextIndex As Integer
 End Type: Public guiBox() As structBox
+
+Dim Gui_TextureLogo     As Direct3DTexture8 'textura
+
 Public Function guiInitialize() As Boolean
 On Error GoTo errHandle
     
@@ -30,24 +33,24 @@ On Error GoTo errHandle
     ReDim guiBox(1 To Size) As structBox
     
     
-    Dim i As Integer
+    Dim I As Integer
         
-        For i = 1 To Size
+        For I = 1 To Size
         
-            guiCreateBox i, CSng(GetVar(Path, CStr(i), "left")), CSng(GetVar(Path, CStr(i), "top")), _
-                            CSng(GetVar(Path, CStr(i), "bottom")), CSng(GetVar(Path, CStr(i), "right")), _
-                        D3DColorARGB(CSng(ReadField$(1, GetVar(Path, CStr(i), "colorup"), Asc("-"))), _
-                                     CSng(ReadField$(2, GetVar(Path, CStr(i), "colorup"), Asc("-"))), _
-                                     CSng(ReadField$(3, GetVar(Path, CStr(i), "colorup"), Asc("-"))), _
-                                     CSng(ReadField$(4, GetVar(Path, CStr(i), "colorup"), Asc("-")))), _
-                        D3DColorARGB(CSng(ReadField$(1, GetVar(Path, CStr(i), "colordown"), Asc("-"))), _
-                                     CSng(ReadField$(2, GetVar(Path, CStr(i), "colordown"), Asc("-"))), _
-                                     CSng(ReadField$(3, GetVar(Path, CStr(i), "colordown"), Asc("-"))), _
-                                     CSng(ReadField$(4, GetVar(Path, CStr(i), "colordown"), Asc("-")))), _
-                            CStr(GetVar(Path, CStr(i), "text")), CSng(GetVar(Path, CStr(i), "textindex"))
+            guiCreateBox I, CSng(GetVar(Path, CStr(I), "left")), CSng(GetVar(Path, CStr(I), "top")), _
+                            CSng(GetVar(Path, CStr(I), "bottom")), CSng(GetVar(Path, CStr(I), "right")), _
+                        D3DColorARGB(CSng(ReadField$(1, GetVar(Path, CStr(I), "colorup"), Asc("-"))), _
+                                     CSng(ReadField$(2, GetVar(Path, CStr(I), "colorup"), Asc("-"))), _
+                                     CSng(ReadField$(3, GetVar(Path, CStr(I), "colorup"), Asc("-"))), _
+                                     CSng(ReadField$(4, GetVar(Path, CStr(I), "colorup"), Asc("-")))), _
+                        D3DColorARGB(CSng(ReadField$(1, GetVar(Path, CStr(I), "colordown"), Asc("-"))), _
+                                     CSng(ReadField$(2, GetVar(Path, CStr(I), "colordown"), Asc("-"))), _
+                                     CSng(ReadField$(3, GetVar(Path, CStr(I), "colordown"), Asc("-"))), _
+                                     CSng(ReadField$(4, GetVar(Path, CStr(I), "colordown"), Asc("-")))), _
+                            CStr(GetVar(Path, CStr(I), "text")), CSng(GetVar(Path, CStr(I), "textindex"))
                             
                             
-        Next i
+        Next I
     
     guiInitialize = True
     Exit Function
@@ -56,9 +59,9 @@ errHandle:
     guiInitialize = False
     MsgBox "Error in GUI" & vbNewLine & Err.Description
 End Function
-Public Sub guiCreateBox(Index As Integer, Left As Integer, Top As Integer, Bottom As Integer, Right As Integer, ColorUp As Long, ColorDown As Long, Text As String, TextIndex As Integer)
+Public Sub guiCreateBox(index As Integer, Left As Integer, Top As Integer, Bottom As Integer, Right As Integer, ColorUp As Long, ColorDown As Long, Text As String, TextIndex As Integer)
     
-    With guiBox(Index)
+    With guiBox(index)
         
         .Text = Text
         .TextIndex = TextIndex
@@ -73,52 +76,40 @@ Public Sub guiCreateBox(Index As Integer, Left As Integer, Top As Integer, Botto
             .Y1 = Top
             .Y2 = Bottom
         
-            guiBox(Index).GeometryVert(0) = setVertex(.X1, .Y1 + .X2, 0, 1, ColorDown, 0, 0, 0)
-            guiBox(Index).GeometryVert(1) = setVertex(.X1, .Y1, 0, 1, ColorUp, 0, 1, 0)
-            guiBox(Index).GeometryVert(2) = setVertex(.X1 + .Y2, .Y1 + .X2, 0, 1, ColorDown, 0, 0, 1)
-            guiBox(Index).GeometryVert(3) = setVertex(.X1 + .Y2, .Y1, 0, 1, ColorUp, 0, 1, 1)
+            guiBox(index).GeometryVert(0) = setVertex(.X1, .Y1 + .X2, 0, 1, ColorDown, 0, 0, 0)
+            guiBox(index).GeometryVert(1) = setVertex(.X1, .Y1, 0, 1, ColorUp, 0, 1, 0)
+            guiBox(index).GeometryVert(2) = setVertex(.X1 + .Y2, .Y1 + .X2, 0, 1, ColorDown, 0, 0, 1)
+            guiBox(index).GeometryVert(3) = setVertex(.X1 + .Y2, .Y1, 0, 1, ColorUp, 0, 1, 1)
 
          End With
          
     End With
 
 End Sub
-Public Sub guiEvents(ByVal X As Single, ByVal Y As Single)
+Public Sub guiEvents(ByVal x As Single, ByVal y As Single)
 
-    Dim i As Long
+    Dim I As Long
         
-        For i = 1 To UBound(guiBox())
+        For I = 1 To UBound(guiBox())
             
-            With guiBox(i).BoxSize
+            With guiBox(I).BoxSize
                     
                 'Static tempX As Single, tempY As Single
                         
                         'tempX = X - .X1
                         'tempY = Y - .Y1
                         
-                        .X1 = X + (X + (.X2 - .X1))
-                        .Y1 = Y + (Y + (.Y2 - .Y1))
+                        .X1 = x + (x + (.X2 - .X1))
+                        .Y1 = y + (y + (.Y2 - .Y1))
                         
-                        guiBox(i).GeometryVert(0) = setVertex(.X1, .Y1 + .X2, 0, 1, guiBox(i).ColorDown, 0, 0, 0)
-                        guiBox(i).GeometryVert(1) = setVertex(.X1, .Y1, 0, 1, guiBox(i).ColorUp, 0, 1, 0)
-                        guiBox(i).GeometryVert(2) = setVertex(.X1 + .Y2, .Y1 + .X2, 0, 1, guiBox(i).ColorDown, 0, 0, 1)
-                        guiBox(i).GeometryVert(3) = setVertex(.X1 + .Y2, .Y1, 0, 1, guiBox(i).ColorUp, 0, 1, 1)
+                        guiBox(I).GeometryVert(0) = setVertex(.X1, .Y1 + .X2, 0, 1, guiBox(I).ColorDown, 0, 0, 0)
+                        guiBox(I).GeometryVert(1) = setVertex(.X1, .Y1, 0, 1, guiBox(I).ColorUp, 0, 1, 0)
+                        guiBox(I).GeometryVert(2) = setVertex(.X1 + .Y2, .Y1 + .X2, 0, 1, guiBox(I).ColorDown, 0, 0, 1)
+                        guiBox(I).GeometryVert(3) = setVertex(.X1 + .Y2, .Y1, 0, 1, guiBox(I).ColorUp, 0, 1, 1)
 
             End With
         
-        Next i
-End Sub
-Public Sub guiRender()
-    
-    Dim i As Long
-        
-        For i = 1 To UBound(guiBox())
-            
-            D3DDevice.SetTexture 0, Nothing
-            D3DDevice.DrawPrimitiveUP D3DPT_TRIANGLESTRIP, 2, guiBox(i).GeometryVert(0), Len(guiBox(i).GeometryVert(0))
-        
-        Next i
-        
+        Next I
 End Sub
 
 Public Sub guiDestroy()

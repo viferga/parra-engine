@@ -77,7 +77,7 @@ Public Sub HandleIncomingData()
     End Select
     
     'Done with this packet, move on to next one
-    If incomingData.Length > 0 And Err.Number <> incomingData.NotEnoughDataErrCode Then
+    If incomingData.Length > 0 And Err.number <> incomingData.NotEnoughDataErrCode Then
         Err.Clear
         HandleIncomingData
     End If
@@ -197,14 +197,14 @@ Private Sub HandleIncomingCharacterCreate()
         
         With characterList(charindex)
             
-            .Name = incomingData.ReadASCIIString()
+            .name = incomingData.ReadASCIIString()
             .Body = incomingData.ReadInteger()
             .Head = incomingData.ReadInteger()
             .Heading = incomingData.ReadByte()
             .Pos.X = incomingData.ReadByte()
             .Pos.Y = incomingData.ReadByte()
             
-            If .Name = frmConnect.UserName Then
+            If .name = frmConnect.UserName Then
                 playerCharIndex = charindex
                 
                 UserPos.X = .Pos.X
@@ -242,7 +242,7 @@ Private Sub HandleIncomingCharacterRemove()
         .Heading = 0
         .Pos.X = 0
         .Pos.Y = 0
-        .Name = ""
+        .name = ""
         .Moving = 0
     
     End With
@@ -277,7 +277,7 @@ Public Sub WriteOutgoingData(ByRef Packed As ClientPacketID)
     End Select
     
     'Done with this packet, move on to next one
-    If outgoingData.Length > 0 And Err.Number <> outgoingData.NotEnoughDataErrCode Then
+    If outgoingData.Length > 0 And Err.number <> outgoingData.NotEnoughDataErrCode Then
         Err.Clear
         WriteOutgoingData Packed
     End If
@@ -327,13 +327,23 @@ Private Sub WriteOutgoingUser()
                 
                 frmConnect.lstPlayers.Visible = False
                 
+                Exit Sub
+                
             Case playerState.plyCreate
+                
+                Exit Sub
             
             Case playerState.plyKill
             
-            Case playerState.plyExit
+                Exit Sub
             
-            Case playerState.plyNone: Exit Sub
+            Case playerState.plyExit
+                frmMain.Visible = False
+                frmConnect.Show
+                Exit Sub
+            
+            Case playerState.plyNone
+                Exit Sub
             
         End Select
         

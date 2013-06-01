@@ -89,7 +89,7 @@ Private g_WindowRect As RECT                     ' size of window (including tit
 
 Private Declare Function GetWindowRect Lib "user32.dll" (ByVal hwnd As Long, ByRef RECT As RECT) As Long
 Private Declare Function GetClientRect Lib "user32.dll" (ByVal hwnd As Long, ByRef RECT As RECT) As Long
-Private Declare Function SetWindowPos Lib "user32.dll" (ByVal hwnd As Long, ByVal hwndafter As Long, ByVal X As Long, ByVal Y As Long, ByVal cx As Long, ByVal cy As Long, ByVal options As Long) As Long
+Private Declare Function SetWindowPos Lib "user32.dll" (ByVal hwnd As Long, ByVal hwndafter As Long, ByVal x As Long, ByVal y As Long, ByVal cx As Long, ByVal cy As Long, ByVal options As Long) As Long
 Private Declare Function SetWindowLongA Lib "user32.dll" (ByVal hwnd As Long, ByVal nIndex As Long, ByVal newVal As Long) As Long
 Private Declare Function GetWindowLongA Lib "user32.dll" (ByVal hwnd As Long, ByVal nIndex As Long) As Long
 
@@ -154,12 +154,12 @@ On Error GoTo errHandle
         SetWindowPos frmConnect.hwnd, 0, 0, 0, 800, 600, 0
     End If
         
-    'With RenderRect
-    '    .Y1 = Top
-    '    .X1 = Left
-    '    .X2 = Width
-    '    .Y2 = Height
-    'End With
+    With RenderRect
+        .Top = Top
+        .Left = Left
+        .Right = Width
+        .Bottom = Height
+    End With
 
     '*******************************
     'Initialize video device
@@ -291,12 +291,12 @@ On Error GoTo errHandle
     BasicColor(0) = -1: BasicColor(1) = -1: BasicColor(2) = -1: BasicColor(3) = -1
     
     'Engine light color
-    Color(0).r = 80: Color(0).g = 80: Color(0).b = 220
-    Color(1).r = 250: Color(1).g = 250: Color(1).b = 200
+    Color(0).r = 80: Color(0).g = 80: Color(0).B = 220
+    Color(1).r = 250: Color(1).g = 250: Color(1).B = 200
     
     'Pixelsperframe for tile engine
-    ScrollPixelsPerFrame.X = 8
-    ScrollPixelsPerFrame.Y = 8
+    ScrollPixelsPerFrame.x = 8
+    ScrollPixelsPerFrame.y = 8
     
     'Create a pixel shader
     'cPixelShader = pixelShaderMakeFromMemory(psOriginalColor)
@@ -310,11 +310,11 @@ On Error GoTo errHandle
     
 errHandle:
 
-    If Err.Number = 429 Then
+    If Err.number = 429 Then
       MsgBox "No se puede iniciar el motor grafico, ya que no ha sido detectado DirectX 8. Reinstalalo", vbCritical
     Else
         MsgBox "Error al iniciar el motor grafico" & vbNewLine _
-        & "ErrNumber: " & Err.Number & vbNewLine _
+        & "ErrNumber: " & Err.number & vbNewLine _
         & "ErrDescription: " & Err.Description, vbOKOnly, "Error"
     End If
 
@@ -343,11 +343,11 @@ Private Function engineInitializingInWindow(hwnd As Long, AdapterIndex As Long, 
         
     g_focushwnd = hwnd
     
-    Dim rc As RECT
-    Call GetClientRect(g_focushwnd, rc)
-    RenderRect.Right = rc.Right - rc.Left
-    RenderRect.Bottom = rc.Bottom - rc.Top
-    Call GetWindowRect(g_focushwnd, RenderRect)
+    'Dim rc As RECT
+    'Call GetClientRect(g_focushwnd, rc)
+    'RenderRect.Right = rc.Right - rc.Left
+    'RenderRect.Bottom = rc.Bottom - rc.Top
+    'Call GetWindowRect(g_focushwnd, RenderRect)
     
     
     With g_Adapters(g_lCurrentAdapter)
@@ -384,7 +384,7 @@ Private Function engineInitializingInWindow(hwnd As Long, AdapterIndex As Long, 
     On Local Error Resume Next
     Set D3DDevice = D3D.CreateDevice(g_lCurrentAdapter, DevType, g_focushwnd, g_behaviorflags, D3DWindow)
 
-    If Err.Number Then
+    If Err.number Then
 
         If bTryFallbacks = False Then Exit Function
         
@@ -405,7 +405,7 @@ Private Function engineInitializingInWindow(hwnd As Long, AdapterIndex As Long, 
             
     End If
 
-    If Err.Number Then
+    If Err.number Then
         
         'The app still hit an error. Both HAL and REF devices weren't created. The app will have to exit at this point.
         MsgBox "No suitable device was found to initialize D3D. Application will now exit.", vbCritical
@@ -514,7 +514,7 @@ Private Function engineInitializingInFullscreen(hwnd As Long, AdapterIndex As Lo
     On Local Error Resume Next
     Set D3DDevice = D3D.CreateDevice(g_lCurrentAdapter, DevType, g_focushwnd, g_behaviorflags, D3DWindow)
 
-    If Err.Number Then
+    If Err.number Then
         If bTryFallbacks = False Then Exit Function
 
         'If a HAL device was being attempted, try again with a REF device instead.
@@ -534,7 +534,7 @@ Private Function engineInitializingInFullscreen(hwnd As Long, AdapterIndex As Lo
     End If
 
 
-    If Err.Number Then
+    If Err.number Then
         
         'The app still hit an error. Both HAL and REF devices weren't created. The app will have to exit at this point.
         MsgBox "No suitable device was found to initialize D3D. Application will now exit.", vbCritical
@@ -1053,17 +1053,17 @@ errHandle:
 End Function
 
 Private Sub clsGraphicalDevice_fontRender(ByRef Text As String, ByRef index As Byte, _
-                            ByRef X As Integer, ByRef Y As Integer, _
+                            ByRef x As Integer, ByRef y As Integer, _
                             ByRef Width As Integer, ByRef Height As Integer, _
                             format As Long)
 
     Static fontRect As RECT 'This defines where it will be
     
     With fontRect
-        .Top = Y + RenderRect.Top
-        .Left = X + RenderRect.Left
-        .Bottom = Y + Height + RenderRect.Top
-        .Right = X + Width + RenderRect.Left
+        .Top = y + RenderRect.Top
+        .Left = x + RenderRect.Left
+        .Bottom = y + Height + RenderRect.Top
+        .Right = x + Width + RenderRect.Left
     End With
     
     D3DX.DrawText Font(index).MainFont, Font(index).Color, Text, fontRect, format
@@ -1077,7 +1077,7 @@ Private Function clsGraphicalDevice_fontInitializing(ByRef Size As Byte) As Bool
     ' Set configuration
     For I = 1 To UBound(Font)
         With Font(I)
-            .MainFontFormat.Name = GetVar(App.Path & "\Init\Fonts.ini", "Font" & CStr(I), "Name")
+            .MainFontFormat.name = GetVar(App.Path & "\Init\Fonts.ini", "Font" & CStr(I), "Name")
             .MainFontFormat.Size = GetVar(App.Path & "\Init\Fonts.ini", "Font" & CStr(I), "Size")
             .Color = D3DColorARGB(ReadField(1, GetVar(App.Path & "\Init\Fonts.ini", "Font" & CStr(I), "ARGB"), Asc("-")), _
                                                   ReadField(2, GetVar(App.Path & "\Init\Fonts.ini", "Font" & CStr(I), "ARGB"), Asc("-")), _
@@ -1089,16 +1089,23 @@ Private Function clsGraphicalDevice_fontInitializing(ByRef Size As Byte) As Bool
         End With
     Next I
 End Function
-Private Sub clsGraphicalDevice_guiRender()
+Private Sub clsGraphicalDevice_guiRender(ByVal Instance As Byte)
     Dim I As Long
         
-        For I = 1 To UBound(guiBox())
-            
-            D3DDevice.SetTexture 0, Nothing
+        If (Instance = 0) Then
+            Static d3dSurface As tempTexture
+            Set d3dSurface.Surface = getSurface(CLng(997), 128, 128)
+    
+            D3DDevice.SetTexture 0, d3dSurface.Surface
             D3DDevice.DrawPrimitiveUP D3DPT_TRIANGLESTRIP, 2, guiBox(I).GeometryVert(0), Len(guiBox(I).GeometryVert(0))
-        
-        Next I
-
+        Else
+            For I = 1 To UBound(guiBox())
+                
+                D3DDevice.SetTexture 0, Nothing
+                D3DDevice.DrawPrimitiveUP D3DPT_TRIANGLESTRIP, 2, guiBox(I).GeometryVert(0), Len(guiBox(I).GeometryVert(0))
+            
+            Next I
+        End If
 End Sub
 
 Private Sub clsGraphicalDevice_resetRenderStates()
@@ -1373,16 +1380,16 @@ On Error GoTo ErrHandler
         'Set last access time (if we didn't we would reckon this texture as the one lru)
         .lastAccess = GetTickCount
         
-            Dim Data() As Byte, lBitMap As Long
+            Dim data() As Byte, lBitMap As Long
             
-            openPng Data(), lBitMap, fileIndex
+            openPng data(), lBitMap, fileIndex
                                 
             'Set .Surface = D3DXLoad.CreateTextureFromFileInMemoryEx(d3Device, data(0), UBound(data()) + 1, D3DX_DEFAULT, _
                                                             D3DX_DEFAULT, 6, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, _
                                                             D3DX_FILTER_DITHER Or D3DX_FILTER_TRIANGLE, D3DX_FILTER_BOX, _
                                                             D3DColorXRGB(0, 0, 0), TexInfo, ByVal 0)
             
-            Set .Surface = D3DXLoad.CreateTextureFromFileInMemory(d3Device, Data(0), lBitMap)
+            Set .Surface = D3DXLoad.CreateTextureFromFileInMemory(d3Device, data(0), lBitMap)
                 
         
                 
@@ -1424,7 +1431,7 @@ Exit Function
 
 ErrHandler:
     MsgBox "Un error inesperado ocurrió al intentar cargar el gráfico " & CStr(fileIndex) & ".png" & ". " & vbCrLf & _
-                "El código de error es " & CStr(Err.Number) & " - " & Err.Description & vbCrLf & vbCrLf & "Copia este mensaje y notifica a los administradores.", _
+                "El código de error es " & CStr(Err.number) & " - " & Err.Description & vbCrLf & vbCrLf & "Copia este mensaje y notifica a los administradores.", _
                 vbOKOnly Or vbCritical Or vbExclamation, "Error"
     End
 End Function
@@ -1485,7 +1492,7 @@ Private Function RemoveLRU() As Boolean
     usedBytes = usedBytes - surfDesc.Size
 End Function
 
-Private Function openPng(ByRef Data() As Byte, ByRef lBitMap As Long, ByVal fileIndex As Long)
+Private Function openPng(ByRef data() As Byte, ByRef lBitMap As Long, ByVal fileIndex As Long)
     
     Dim Handle As Integer
     
@@ -1495,9 +1502,9 @@ Private Function openPng(ByRef Data() As Byte, ByRef lBitMap As Long, ByVal file
             
             lBitMap = LOF(Handle)
             
-            ReDim Data(lBitMap - 1) As Byte  ' Create an array just big enough to hold the whole file
+            ReDim data(lBitMap - 1) As Byte  ' Create an array just big enough to hold the whole file
             
-            Get #Handle, , Data() ' Read the file into that array
+            Get #Handle, , data() ' Read the file into that array
    
         Close #Handle
 

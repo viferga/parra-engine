@@ -21,6 +21,9 @@ Public Type structBox
     Text As String
     TextIndex As Integer
 End Type: Public guiBox() As structBox
+
+Dim Gui_TextureLogo     As Direct3DTexture8 'textura
+
 Public Function guiInitialize() As Boolean
 On Error GoTo errHandle
     
@@ -83,7 +86,7 @@ Public Sub guiCreateBox(index As Integer, Left As Integer, Top As Integer, Botto
     End With
 
 End Sub
-Public Sub guiEvents(ByVal X As Single, ByVal Y As Single)
+Public Sub guiEvents(ByVal x As Single, ByVal y As Single)
 
     Dim I As Long
         
@@ -96,8 +99,8 @@ Public Sub guiEvents(ByVal X As Single, ByVal Y As Single)
                         'tempX = X - .X1
                         'tempY = Y - .Y1
                         
-                        .X1 = X + (X + (.X2 - .X1))
-                        .Y1 = Y + (Y + (.Y2 - .Y1))
+                        .X1 = x + (x + (.X2 - .X1))
+                        .Y1 = y + (y + (.Y2 - .Y1))
                         
                         guiBox(I).GeometryVert(0) = setVertex(.X1, .Y1 + .X2, 0, 1, guiBox(I).ColorDown, 0, 0, 0)
                         guiBox(I).GeometryVert(1) = setVertex(.X1, .Y1, 0, 1, guiBox(I).ColorUp, 0, 1, 0)

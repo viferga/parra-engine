@@ -68,7 +68,7 @@ Public Function initializeMotionBlur() As Boolean
 End Function
 
 Public Sub fontRender(ByRef Text As String, ByRef index As Byte, _
-                            ByRef X As Integer, ByRef Y As Integer, _
+                            ByRef x As Integer, ByRef y As Integer, _
                             ByRef Width As Integer, ByRef Height As Integer, _
                             format As Long) 'GDK: revisar parametros, no se si seran igual en ogl.
                             
@@ -78,7 +78,7 @@ Public Function fontInitializing(ByRef Size As Byte) As Boolean
 
 End Function
 
-Public Sub guiRender()
+Public Sub guiRender(ByVal Instance As Byte)
 
 End Sub
 

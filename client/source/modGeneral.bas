@@ -1,6 +1,7 @@
 Attribute VB_Name = "modGeneral"
 Option Explicit
 
+Public Instance As Byte '0 =Conectar ; 1=Account ; 2=Conectado
 Public GraphicalDevice As clsGraphicalDevice
 Public GraphicalApi As Byte
 
@@ -18,7 +19,7 @@ Public Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
 Private Declare Function GetKeyState Lib "user32" (ByVal nVirtKey As Long) As Long
 
 'MouseInput
-Private Type PointAPI
+Private Type POINTAPI
     X As Long
     Y As Long
 End Type
@@ -36,6 +37,9 @@ Sub main()
     'Show the main form
     frmMain.Show
     frmMain.Visible = False
+    
+    'Instance = 0
+    'CreateForms
     
     loadConnectionInfo generalIP, generalPort
     

@@ -20,7 +20,7 @@ Public Type mapBlock
 
     Layer(1 To 4) As structGrh
         
-    CharIndex As Integer
+    charindex As Integer
     
     Blocked   As Byte
     Trigger   As Byte
@@ -66,46 +66,46 @@ Private Sub mapLoad(Mapa As Long)
 End Sub
 Private Sub mapAutoCreate()
 
-    Dim X As Long, Y As Long
+    Dim x As Long, y As Long
     Dim dX As Integer, dY As Integer
     
       
     ReDim mapData(1 To MaxTilesX, 1 To MaxTilesY) As mapBlock
                 
-    For X = 1 To MaxTilesY
-        For Y = 1 To MaxTilesX
+    For x = 1 To MaxTilesY
+        For y = 1 To MaxTilesX
         
             ' Create Layer 1
-            mapData(X, Y).Layer(1).GrhIndex = RandomNumber(1, 2)
+            mapData(x, y).Layer(1).GrhIndex = RandomNumber(1, 2)
       
             ' Create Layer 3
-            mapData(X, Y).Layer(3).GrhIndex = RandomNumber(1, 30)
+            mapData(x, y).Layer(3).GrhIndex = RandomNumber(1, 30)
                         
-            If mapData(X, Y).Layer(3).GrhIndex > 3 Then
-                mapData(X, Y).Layer(3).GrhIndex = 0
+            If mapData(x, y).Layer(3).GrhIndex > 3 Then
+                mapData(x, y).Layer(3).GrhIndex = 0
             Else
-                mapData(X, Y).Layer(3).GrhIndex = 3
+                mapData(x, y).Layer(3).GrhIndex = 3
             End If
                
             ' Create Particle Layer
-            mapData(X, Y).particleIndex = RandomNumber(1, 1000)
+            mapData(x, y).particleIndex = RandomNumber(1, 1000)
                         
-            If mapData(X, Y).particleIndex > 19 Then
-                mapData(X, Y).particleIndex = 0
+            If mapData(x, y).particleIndex > 19 Then
+                mapData(x, y).particleIndex = 0
             End If
                 
             ' PreCalculate position
-            If (X Mod 2) = 0 Then
+            If (x Mod 2) = 0 Then
                 dX = -HalfTileWidth: dY = -HalfTileHeight
             Else
                 dX = -HalfTileWidth: dY = 0
             End If
                 
-            mapPreCalcPos(X, Y).X = TilePixelWidth * X - TilePixelWidth + dX
-            mapPreCalcPos(X, Y).Y = TilePixelHeight * Y - TilePixelHeight + dY
+            mapPreCalcPos(x, y).x = TilePixelWidth * x - TilePixelWidth + dX
+            mapPreCalcPos(x, y).y = TilePixelHeight * y - TilePixelHeight + dY
                 
-        Next Y
-    Next X
+        Next y
+    Next x
     
 End Sub
 Public Sub mapUnloadAll()
@@ -113,25 +113,25 @@ Public Sub mapUnloadAll()
     Erase mapData
     
 End Sub
-Public Function mapLegalPos(ByVal X As Integer, ByVal Y As Integer) As Boolean
+Public Function mapLegalPos(ByVal x As Integer, ByVal y As Integer) As Boolean
     
-    If Not mapInBounds(X, Y) Then
+    If Not mapInBounds(x, y) Then
         Exit Function
     End If
     
-    If mapData(X, Y).Blocked = 1 Then
+    If mapData(x, y).Blocked = 1 Then
         Exit Function
     End If
     
-    If mapData(X, Y).CharIndex > 0 Then
+    If mapData(x, y).charindex > 0 Then
         Exit Function
     End If
        
     mapLegalPos = True
 End Function
-Function mapInBounds(ByVal X As Integer, ByVal Y As Integer) As Boolean
+Function mapInBounds(ByVal x As Integer, ByVal y As Integer) As Boolean
     
-    If X < 1 Or X > 100 Or Y < 1 Or Y > 100 Then
+    If x < 1 Or x > 100 Or y < 1 Or y > 100 Then
         Exit Function
     End If
     
@@ -146,7 +146,7 @@ Public Sub mapAddGrh(ByVal Layer As Byte)
 
     If frmMain.grhList.ListIndex + 1 > 0 Then
 
-        With mapData(MouseTilesPos.X, MouseTilesPos.Y)
+        With mapData(MouseTilesPos.x, MouseTilesPos.y)
             
             .Layer(Layer).GrhIndex = frmMain.grhList.ListIndex + 1
             
@@ -158,10 +158,9 @@ End Sub
 
 Public Sub mapRemoveGrh(ByVal Layer As Byte)
 
-    mapData(MouseTilesPos.X, MouseTilesPos.Y).Layer(Layer).GrhIndex = 0
+    mapData(MouseTilesPos.x, MouseTilesPos.y).Layer(Layer).GrhIndex = 0
 
 End Sub
-
 
 Public Sub mapSave(mapIndex As Long)
 

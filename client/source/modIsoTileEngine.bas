@@ -154,15 +154,9 @@ Public Declare Function GetTickCount Lib "kernel32" () As Long
 Public Declare Function QueryPerformanceFrequency Lib "kernel32" (lpFrequency As Currency) As Long
 Public Declare Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCount As Currency) As Long
 
-<<<<<<< HEAD
-Private Declare Function GetWindowRect Lib "user32.dll" (ByVal hwnd As Long, ByRef RECT As RECT) As Long
-Private Declare Function GetClientRect Lib "user32.dll" (ByVal hwnd As Long, ByRef RECT As RECT) As Long
-Private Declare Function SetWindowPos Lib "user32.dll" (ByVal hwnd As Long, ByVal hwndafter As Long, ByVal x As Long, ByVal y As Long, ByVal cx As Long, ByVal cy As Long, ByVal options As Long) As Long
-=======
 Private Declare Function GetWindowRect Lib "user32.dll" (ByVal hWnd As Long, ByRef RECT As RECT) As Long
 Private Declare Function GetClientRect Lib "user32.dll" (ByVal hWnd As Long, ByRef RECT As RECT) As Long
 Private Declare Function SetWindowPos Lib "user32.dll" (ByVal hWnd As Long, ByVal hwndafter As Long, ByVal X As Long, ByVal Y As Long, ByVal cx As Long, ByVal cy As Long, ByVal options As Long) As Long
->>>>>>> parra_branch
 'Private Declare Function SetWindowLongA Lib "user32.dll" (ByVal hwnd As Long, ByVal nIndex As Long, ByVal newVal As Long) As Long
 'Private Declare Function GetWindowLongA Lib "user32.dll" (ByVal hwnd As Long, ByVal nIndex As Long) As Long
 
@@ -250,11 +244,11 @@ Public Sub showNextFrame()
     If UserMoving Then
     
     '****** Move screen Left and Right if needed ******
-        If AddtoUserPos.x <> 0 Then
-            OffsetCounter.x = OffsetCounter.x - ScrollPixelsPerFrame.x * AddtoUserPos.x * timerTicksPerFrame
-            If Abs(OffsetCounter.x) >= Abs(TilePixelWidth * AddtoUserPos.x) Then
-                OffsetCounter.x = 0
-                AddtoUserPos.x = 0
+        If AddtoUserPos.X <> 0 Then
+            OffsetCounter.X = OffsetCounter.X - ScrollPixelsPerFrame.X * AddtoUserPos.X * timerTicksPerFrame
+            If Abs(OffsetCounter.X) >= Abs(TilePixelWidth * AddtoUserPos.X) Then
+                OffsetCounter.X = 0
+                AddtoUserPos.X = 0
                 UserMoving = False
             End If
         End If
@@ -274,28 +268,11 @@ Public Sub showNextFrame()
 #If ParticleEditor = 1 Then
     End If
 #End If
-<<<<<<< HEAD
-
-    'If (testCooperative = False) Then Exit Sub
-   If Not (GraphicalDevice.DeviceIsContextValid = DEVICE_CTX_VALID) Then Exit Sub
-   ' With D3DDevice
-        
-   '     If MotionBlur = True And errMotion = False Then
-   '         .SetRenderTarget m_pDisplayTextureSurface, m_pDisplayZSurface, 0
-   '         .Clear 1, RenderRect, D3DCLEAR_TARGET Or D3DCLEAR_ZBUFFER, 0, 1#, 0
-   '     Else
-   '         .Clear 1, RenderRect, D3DCLEAR_TARGET Or D3DCLEAR_ZBUFFER, 0, 1#, 0
-   '     End If
-        
-   '         .BeginScene
-    GraphicalDevice.BeginScene RenderRect, CLEAR_FLAGS.CLEAR_COLOR
-=======
     
     If Not (GraphicalDevice.DeviceIsContextValid = DEVICE_CTX_VALID) Then Exit Sub
     
     GraphicalDevice.BeginScene RenderRect, CLEAR_FLAGS.CLEAR_COLOR Or CLEAR_FLAGS.CLEAR_DEPTH, (MotionBlur = True And errMotion = False)
         
->>>>>>> parra_branch
     
             #If ParticleEditor = 1 Then
                 If EditParticle = False Then
@@ -304,11 +281,7 @@ Public Sub showNextFrame()
                'Render Map
                 mapRender OffsetCounter
 
-<<<<<<< HEAD
-                fontRender CStr("X: " & CStr(UserPos.x) & " Y: " & CStr(UserPos.y)), 2, 300, 0, 130, 20, DT_LEFT
-=======
                 fontRender CStr("X: " & CStr(UserPos.X) & " Y: " & CStr(UserPos.Y)), 2, 300, 0, 130, 20, DT_LEFT
->>>>>>> parra_branch
             
             #If ParticleEditor = 1 Then
                 End If
@@ -318,19 +291,11 @@ Public Sub showNextFrame()
                 
                 #If WorldEditor = 1 Then
                     If EditMap = True Then
-<<<<<<< HEAD
-                        fontRender CStr("MouseX: " & CStr(MouseTilesPos.x) & " MouseY: " & CStr(MouseTilesPos.y)), 2, 560, 1, 240, 20, DT_LEFT
-                        
-                        'Render grhSelected
-                        If frmMain.grhList.ListIndex + 1 > 0 Then
-                            GraphicalDevice.renderTexture frmMain.grhList.ListIndex + 1, Mouse.x, Mouse.y, BasicColor(), frmMain.cmbMode.ListIndex
-=======
                         fontRender CStr("MouseX: " & CStr(MouseTilesPos.X) & " MouseY: " & CStr(MouseTilesPos.Y)), 2, 560, 1, 240, 20, DT_LEFT
                         
                         'Render grhSelected
                         If frmMain.grhList.ListIndex + 1 > 0 Then
                             GraphicalDevice.renderTexture frmMain.grhList.ListIndex + 1, Mouse.X, Mouse.Y, BasicColor(), frmMain.cmbMode.ListIndex
->>>>>>> parra_branch
                         End If
                     End If
                 #End If
@@ -365,11 +330,7 @@ Public Sub fontDeInitializing()
     
 End Sub
 Private Sub fontRender(ByRef Text As String, ByRef index As Byte, _
-<<<<<<< HEAD
-                            ByRef x As Integer, ByRef y As Integer, _
-=======
                             ByRef X As Integer, ByRef Y As Integer, _
->>>>>>> parra_branch
                             ByRef Width As Integer, ByRef Height As Integer, _
                             format As Long)
                             
@@ -377,28 +338,6 @@ Private Sub fontRender(ByRef Text As String, ByRef index As Byte, _
 End Sub
 Public Sub Move(ByVal Direction As eDirection)
     
-<<<<<<< HEAD
-    Dim x As Integer
-    Dim y As Integer
-    
-    'Figure out which way to move
-    Select Case Direction
-        Case eDirection.NorthEast: y = -1: x = 1
-        
-        Case eDirection.NorthWest: y = -1: x = -1
-        
-        Case eDirection.SouthEast: y = 1: x = 1
-        
-        Case eDirection.SouthWest: y = 1: x = -1
-        
-        Case eDirection.North: y = -1: x = 0
-        
-        Case eDirection.South: y = 1: x = 0
-        
-        Case eDirection.East: y = 0: x = 1
-        
-        Case eDirection.West: y = 0: x = -1
-=======
     Dim X As Integer
     Dim Y As Integer
     
@@ -419,17 +358,12 @@ Public Sub Move(ByVal Direction As eDirection)
         Case eDirection.East: Y = 0: X = 1
         
         Case eDirection.West: Y = 0: X = -1
->>>>>>> parra_branch
         
     End Select
     
     Dim PositionOk As Boolean
     
-<<<<<<< HEAD
-    PositionOk = mapLegalPos(UserPos.x + x, UserPos.y + y)
-=======
     PositionOk = mapLegalPos(UserPos.X + X, UserPos.Y + Y)
->>>>>>> parra_branch
     
     If PositionOk Then 'and usernot paralizate, etc..
         MoveChar playerCharIndex, Direction
@@ -446,19 +380,11 @@ End Sub
 Private Sub MoveChar(ByRef characterIndex As Integer, Direction As eDirection)
 
     Dim addX As Integer, addY As Integer
-<<<<<<< HEAD
-    Dim x As Integer, y As Integer
-    
-    With characterList(characterIndex)
-        x = .Pos.x
-        y = .Pos.y
-=======
     Dim X As Integer, Y As Integer
     
     With characterList(characterIndex)
         X = .Pos.X
         Y = .Pos.Y
->>>>>>> parra_branch
 
         'Figure out which way to move
         Select Case Direction
@@ -497,15 +423,6 @@ Private Sub MoveChar(ByRef characterIndex As Integer, Direction As eDirection)
                 
         End Select
         
-<<<<<<< HEAD
-        mapData(x + addX, y + addY).charindex = characterIndex
-        .Pos.x = x + addX
-        .Pos.y = y + addY
-        mapData(x, y).charindex = 0
-        
-        .MoveOffset.x = -1 * (TilePixelWidth * addX)
-        .MoveOffset.y = -1 * (TilePixelHeight * addY)
-=======
         mapData(X + addX, Y + addY).charindex = characterIndex
         .Pos.X = X + addX
         .Pos.Y = Y + addY
@@ -513,65 +430,33 @@ Private Sub MoveChar(ByRef characterIndex As Integer, Direction As eDirection)
         
         .MoveOffset.X = -1 * (TilePixelWidth * addX)
         .MoveOffset.Y = -1 * (TilePixelHeight * addY)
->>>>>>> parra_branch
         
         .Moving = 1
         .Heading = Direction
         
-<<<<<<< HEAD
-        .scrollDirection.x = addX
-        .scrollDirection.y = addY
-=======
         .scrollDirection.X = addX
         .scrollDirection.Y = addY
->>>>>>> parra_branch
     End With
     
     'If uStats.Estado <> 1 Then Call DoPasosFx(CharIndex)
     
     'areas viejos
     
-<<<<<<< HEAD
-    If mapInBounds(x + addX, y + addY) = False Then
-=======
     If mapInBounds(X + addX, Y + addY) = False Then
->>>>>>> parra_branch
         'charactererase characterIndex
     End If
 
 End Sub
 Private Sub MoveScreen(Direction As eDirection)
     
-<<<<<<< HEAD
-    Dim x As Integer
-    Dim y As Integer
-=======
     Dim X As Integer
     Dim Y As Integer
->>>>>>> parra_branch
     Dim tX As Integer
     Dim tY As Integer
     
     'Figure out which way to move
         Select Case Direction
         
-<<<<<<< HEAD
-            Case eDirection.NorthEast: y = -1: x = 1
-            
-            Case eDirection.NorthWest: y = -1: x = -1
-            
-            Case eDirection.SouthEast: y = 1: x = 1
-            
-            Case eDirection.SouthWest: y = 1: x = -1
-            
-            Case eDirection.North: y = -1: x = 0
-            
-            Case eDirection.South: y = 1: x = 0
-            
-            Case eDirection.East: y = 0: x = 1
-            
-            Case eDirection.West: y = 0: x = -1
-=======
             Case eDirection.NorthEast: Y = -1: X = 1
             
             Case eDirection.NorthWest: Y = -1: X = -1
@@ -587,36 +472,23 @@ Private Sub MoveScreen(Direction As eDirection)
             Case eDirection.East: Y = 0: X = 1
             
             Case eDirection.West: Y = 0: X = -1
->>>>>>> parra_branch
     
                 
         End Select
     
     'Fill temp pos
-<<<<<<< HEAD
-    tX = UserPos.x + x
-    tY = UserPos.y + y
-=======
     tX = UserPos.X + X
     tY = UserPos.Y + Y
->>>>>>> parra_branch
     
     'Check to see if its out of bounds
     If mapInBounds(tX, tY) = False Then
         Exit Sub
     Else
         'Start moving... MainLoop does the rest
-<<<<<<< HEAD
-        AddtoUserPos.x = x
-        AddtoUserPos.y = y
-        UserPos.x = tX
-        UserPos.y = tY
-=======
         AddtoUserPos.X = X
         AddtoUserPos.Y = Y
         UserPos.X = tX
         UserPos.Y = tY
->>>>>>> parra_branch
         UserMoving = 1
     End If
 End Sub
@@ -628,11 +500,11 @@ Private Sub mapRender(ByRef PixelOffset As structPositionSng)
         Dim tempX As Single, tempY As Single ' temp position
         Dim offX As Single, offY As Single ' temp offset
         
-        If PixelOffset.x <> 0 Then
-            If PixelOffset.x < 0 Then
-                offX = 64 + PixelOffset.x
+        If PixelOffset.X <> 0 Then
+            If PixelOffset.X < 0 Then
+                offX = 64 + PixelOffset.X
             Else
-                offX = -64 + PixelOffset.x
+                offX = -64 + PixelOffset.X
             End If
         End If
         
@@ -647,13 +519,8 @@ Private Sub mapRender(ByRef PixelOffset As structPositionSng)
         
         ' Controla el tamaño de tX & tY
         
-<<<<<<< HEAD
-        tX = UserPos.x
-        tY = UserPos.y
-=======
         tX = UserPos.X
         tY = UserPos.Y
->>>>>>> parra_branch
         
         If tY - TileBufferSize < 1 Then
             tY = 1 + TileBufferSize
@@ -695,37 +562,27 @@ Private Sub mapRender(ByRef PixelOffset As structPositionSng)
         
         ' Controla el mouseTilePos
         
-<<<<<<< HEAD
-        MouseTilesPos.x = (UserPos.x * 64 + Mouse.x) \ TilePixelWidth
-        MouseTilesPos.y = (UserPos.y * 64 + Mouse.y) \ TilePixelHeight
-=======
         MouseTilesPos.X = (UserPos.X * 64 + Mouse.X) \ TilePixelWidth
         MouseTilesPos.Y = (UserPos.Y * 64 + Mouse.Y) \ TilePixelHeight
->>>>>>> parra_branch
         
-        If MouseTilesPos.x < 1 Then
-            MouseTilesPos.x = 1
+        If MouseTilesPos.X < 1 Then
+            MouseTilesPos.X = 1
         End If
         
         If MouseTilesPos.Y < 1 Then
             MouseTilesPos.Y = 1
         End If
         
-        If MouseTilesPos.x > MaxTilesX Then
-            MouseTilesPos.x = MaxTilesX
+        If MouseTilesPos.X > MaxTilesX Then
+            MouseTilesPos.X = MaxTilesX
         End If
         
         If MouseTilesPos.Y > MaxTilesY Then
             MouseTilesPos.Y = MaxTilesY
         End If
         
-<<<<<<< HEAD
-        MousePosOnMap.x = mapPreCalcPos(MouseTilesPos.x, MouseTilesPos.y).x
-        MousePosOnMap.y = mapPreCalcPos(MouseTilesPos.x, MouseTilesPos.y).y
-=======
         MousePosOnMap.X = mapPreCalcPos(MouseTilesPos.X, MouseTilesPos.Y).X
         MousePosOnMap.Y = mapPreCalcPos(MouseTilesPos.X, MouseTilesPos.Y).Y
->>>>>>> parra_branch
         
     Static LastCount As Long
     
@@ -734,15 +591,6 @@ Private Sub mapRender(ByRef PixelOffset As structPositionSng)
         For lY = tY - TileBufferSize To tY2 + TileBufferSize
             For lX = tX - TileBufferSize To tX2 + TileBufferSize
     
-<<<<<<< HEAD
-                tempX = mapPreCalcPos(lX, lY).x - UserPos.x * TilePixelWidth + offX
-                tempY = mapPreCalcPos(lX, lY).y - UserPos.y * TilePixelHeight + offY
-    
-                mapData(lX, lY).LightColor(0) = CalcVertexLight(3, Mouse.x, Mouse.y, tempX + 64, tempY, Color(1), Color(0))
-                mapData(lX, lY).LightColor(1) = CalcVertexLight(3, Mouse.x, Mouse.y, tempX + 128, tempY + 32, Color(1), Color(0))
-                mapData(lX, lY).LightColor(2) = CalcVertexLight(3, Mouse.x, Mouse.y, tempX, tempY + 32, Color(1), Color(0))
-                mapData(lX, lY).LightColor(3) = CalcVertexLight(3, Mouse.x, Mouse.y, tempX + 64, tempY + 64, Color(1), Color(0))
-=======
                 tempX = mapPreCalcPos(lX, lY).X - UserPos.X * TilePixelWidth + offX
                 tempY = mapPreCalcPos(lX, lY).Y - UserPos.Y * TilePixelHeight + offY
     
@@ -750,7 +598,6 @@ Private Sub mapRender(ByRef PixelOffset As structPositionSng)
                 mapData(lX, lY).LightColor(1) = CalcVertexLight(3, Mouse.X, Mouse.Y, tempX + 128, tempY + 32, Color(1), Color(0))
                 mapData(lX, lY).LightColor(2) = CalcVertexLight(3, Mouse.X, Mouse.Y, tempX, tempY + 32, Color(1), Color(0))
                 mapData(lX, lY).LightColor(3) = CalcVertexLight(3, Mouse.X, Mouse.Y, tempX + 64, tempY + 64, Color(1), Color(0))
->>>>>>> parra_branch
     
                 'vertex(0) = setVertex(cX + .Width, cY, 0, 1, Color(0), 0, 0, 0)
                 'vertex(1) = setVertex(cX + (.Width * 2), cY + (.Height * 0.5), 0, 1, Color(1), 0, 1, 0)
@@ -771,13 +618,8 @@ Private Sub mapRender(ByRef PixelOffset As structPositionSng)
         For lY = tY To tY2 + 2
             For lX = tX - 1 To tX2 + TileBufferSize
                 
-<<<<<<< HEAD
-                tempX = mapPreCalcPos(lX, lY).x - UserPos.x * TilePixelWidth + offX
-                tempY = mapPreCalcPos(lX, lY).y - UserPos.y * TilePixelHeight + offY
-=======
                 tempX = mapPreCalcPos(lX, lY).X - UserPos.X * TilePixelWidth + offX
                 tempY = mapPreCalcPos(lX, lY).Y - UserPos.Y * TilePixelHeight + offY
->>>>>>> parra_branch
                 
                 'Layer 1 **********************************
                 GraphicalDevice.renderTexture mapData(lX, lY).Layer(1).GrhIndex, _
@@ -802,13 +644,8 @@ Private Sub mapRender(ByRef PixelOffset As structPositionSng)
         For lY = tY - TileBufferSize To tY2 + TileBufferSize
             For lX = tX - TileBufferSize To tX2 + TileBufferSize
         
-<<<<<<< HEAD
-                tempX = mapPreCalcPos(lX, lY).x - UserPos.x * TilePixelWidth + offX
-                tempY = mapPreCalcPos(lX, lY).y - UserPos.y * TilePixelHeight + offY
-=======
                 tempX = mapPreCalcPos(lX, lY).X - UserPos.X * TilePixelWidth + offX
                 tempY = mapPreCalcPos(lX, lY).Y - UserPos.Y * TilePixelHeight + offY
->>>>>>> parra_branch
         
                 'Layer 3 **********************************
                 If mapData(lX, lY).Layer(3).GrhIndex > 0 Then
@@ -825,13 +662,8 @@ Private Sub mapRender(ByRef PixelOffset As structPositionSng)
         For lY = tY - TileBufferSize To tY2 + TileBufferSize
             For lX = tX - TileBufferSize To tX2 + TileBufferSize
         
-<<<<<<< HEAD
-                tempX = mapPreCalcPos(lX, lY).x - UserPos.x * TilePixelWidth + offX
-                tempY = mapPreCalcPos(lX, lY).y - UserPos.y * TilePixelHeight + offY
-=======
                 tempX = mapPreCalcPos(lX, lY).X - UserPos.X * TilePixelWidth + offX
                 tempY = mapPreCalcPos(lX, lY).Y - UserPos.Y * TilePixelHeight + offY
->>>>>>> parra_branch
         
                 'ParticleLayer ****************************
                 If mapData(lX, lY).particleIndex > 0 Then
@@ -916,19 +748,11 @@ Public Function GeometryBoxType(ByRef Grh As structGrhData, ByRef cx As Single, 
         End Select
         
 End Function
-<<<<<<< HEAD
-Public Function setVertex(ByRef x As Single, ByRef y As Single, ByRef z As Single, ByRef rhw As Single, ByRef Color As Long, ByRef Specular As Long, ByRef tu As Single, ByRef tv As Single) As D3DTLVERTEX
-    
-    With setVertex
-        .sX = x
-        .sY = y
-=======
 Public Function setVertex(ByRef X As Single, ByRef Y As Single, ByRef z As Single, ByRef rhw As Single, ByRef Color As Long, ByRef Specular As Long, ByRef tu As Single, ByRef tv As Single) As D3DTLVERTEX
     
     With setVertex
         .sX = X
         .sY = Y
->>>>>>> parra_branch
         .sz = z
         .rhw = rhw
         .Color = Color

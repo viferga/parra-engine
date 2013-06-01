@@ -177,11 +177,7 @@ Dim strTemp As String
             Call PostQuitMessage(0&)
         
         Case WM_SETCURSOR
-<<<<<<< HEAD
             SetCursor hCursor
-=======
-            'SetCursor hCursor
->>>>>>> parra_branch
         
         
     End Select

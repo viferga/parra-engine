@@ -87,19 +87,11 @@ Private g_lWindowWidth As Long                   ' backbuffer width of windowed 
 Private g_lWindowHeight As Long                  ' backbuffer  height of windowed state
 Private g_WindowRect As RECT                     ' size of window (including title bar)
 
-<<<<<<< HEAD
-Private Declare Function GetWindowRect Lib "user32.dll" (ByVal hwnd As Long, ByRef RECT As RECT) As Long
-Private Declare Function GetClientRect Lib "user32.dll" (ByVal hwnd As Long, ByRef RECT As RECT) As Long
-Private Declare Function SetWindowPos Lib "user32.dll" (ByVal hwnd As Long, ByVal hwndafter As Long, ByVal x As Long, ByVal y As Long, ByVal cx As Long, ByVal cy As Long, ByVal options As Long) As Long
-Private Declare Function SetWindowLongA Lib "user32.dll" (ByVal hwnd As Long, ByVal nIndex As Long, ByVal newVal As Long) As Long
-Private Declare Function GetWindowLongA Lib "user32.dll" (ByVal hwnd As Long, ByVal nIndex As Long) As Long
-=======
 Private Declare Function GetWindowRect Lib "user32.dll" (ByVal hWnd As Long, ByRef RECT As RECT) As Long
 Private Declare Function GetClientRect Lib "user32.dll" (ByVal hWnd As Long, ByRef RECT As RECT) As Long
 Private Declare Function SetWindowPos Lib "user32.dll" (ByVal hWnd As Long, ByVal hwndafter As Long, ByVal X As Long, ByVal Y As Long, ByVal cx As Long, ByVal cy As Long, ByVal options As Long) As Long
 Private Declare Function SetWindowLongA Lib "user32.dll" (ByVal hWnd As Long, ByVal nIndex As Long, ByVal newVal As Long) As Long
 Private Declare Function GetWindowLongA Lib "user32.dll" (ByVal hWnd As Long, ByVal nIndex As Long) As Long
->>>>>>> parra_branch
 
 '***************************************Graphics Loader************************************************
 
@@ -159,11 +151,7 @@ On Error GoTo errHandle
     Call D3DEnum_BuildAdapterList(Frm)
     
     If Windowed = False Then
-<<<<<<< HEAD
-        SetWindowPos frmConnect.hwnd, 0, 0, 0, 800, 600, 0
-=======
         SetWindowPos frmConnect.hWnd, 0, 0, 0, 800, 600, 0
->>>>>>> parra_branch
     End If
         
     With RenderRect
@@ -180,15 +168,9 @@ On Error GoTo errHandle
     DevType = D3DDEVTYPE_HAL
     
     If Windowed Then
-<<<<<<< HEAD
-        clsGraphicalDevice_Initialize = engineInitializingInWindow(Frm.hwnd, 0, DevType, True)
-    Else
-        clsGraphicalDevice_Initialize = engineInitializingInFullscreen(Frm.hwnd, 0, 0, DevType, True, BitsPerPixel)
-=======
         clsGraphicalDevice_Initialize = engineInitializingInWindow(Frm.hWnd, 0, DevType, True)
     Else
         clsGraphicalDevice_Initialize = engineInitializingInFullscreen(Frm.hWnd, 0, 0, DevType, True, BitsPerPixel)
->>>>>>> parra_branch
     End If
     
 
@@ -313,13 +295,8 @@ On Error GoTo errHandle
     Color(1).r = 250: Color(1).g = 250: Color(1).B = 200
     
     'Pixelsperframe for tile engine
-<<<<<<< HEAD
-    ScrollPixelsPerFrame.x = 8
-    ScrollPixelsPerFrame.y = 8
-=======
     ScrollPixelsPerFrame.X = 8
     ScrollPixelsPerFrame.Y = 8
->>>>>>> parra_branch
     
     'Create a pixel shader
     'cPixelShader = pixelShaderMakeFromMemory(psOriginalColor)
@@ -345,11 +322,7 @@ errHandle:
 
 End Function
 
-<<<<<<< HEAD
-Private Function engineInitializingInWindow(hwnd As Long, AdapterIndex As Long, DevType As CONST_D3DDEVTYPE, bTryFallbacks As Boolean) As Boolean
-=======
 Private Function engineInitializingInWindow(hWnd As Long, AdapterIndex As Long, DevType As CONST_D3DDEVTYPE, bTryFallbacks As Boolean) As Boolean
->>>>>>> parra_branch
    
     On Error GoTo errOut
     
@@ -365,17 +338,10 @@ Private Function engineInitializingInWindow(hWnd As Long, AdapterIndex As Long, 
         .BackBufferCount = 1
         .EnableAutoDepthStencil = 1
         .AutoDepthStencilFormat = D3DFMT_D16
-<<<<<<< HEAD
-        .hDeviceWindow = hwnd
-    End With
-        
-    g_focushwnd = hwnd
-=======
         .hDeviceWindow = hWnd
     End With
         
     g_focushwnd = hWnd
->>>>>>> parra_branch
     
     'Dim rc As RECT
     'Call GetClientRect(g_focushwnd, rc)
@@ -471,11 +437,7 @@ errOut:
     Debug.Print "Failed Engine Initiation"
 
 End Function
-<<<<<<< HEAD
-Private Function engineInitializingInFullscreen(hwnd As Long, AdapterIndex As Long, modeIndex As Long, DevType As CONST_D3DDEVTYPE, bTryFallbacks As Boolean, BitsPerPixel As Byte) As Boolean
-=======
 Private Function engineInitializingInFullscreen(hWnd As Long, AdapterIndex As Long, modeIndex As Long, DevType As CONST_D3DDEVTYPE, bTryFallbacks As Boolean, BitsPerPixel As Byte) As Boolean
->>>>>>> parra_branch
     
     On Error GoTo errOut
     
@@ -487,11 +449,7 @@ Private Function engineInitializingInFullscreen(hWnd As Long, AdapterIndex As Lo
     g_lCurrentAdapter = AdapterIndex
         
     
-<<<<<<< HEAD
-    g_focushwnd = hwnd
-=======
     g_focushwnd = hWnd
->>>>>>> parra_branch
     
     
     'switching from windowed to fullscreen so save height and width
@@ -1014,39 +972,6 @@ Private Function clsGraphicalDevice_DeviceIsContextValid() As DEVICE_NO_ERROR
     End With
 End Function
 
-<<<<<<< HEAD
-Private Sub clsGraphicalDevice_BeginScene(ClearRect As RECT, flags As CLEAR_FLAGS)
-Dim CustomFlags As Long
-CustomFlags = 0
-
-'.SetRenderTarget m_pDisplayTextureSurface, m_pDisplayZSurface, 0 'TERMINAR MOTION BLUR
-
-    If (flags And CLEAR_COLOR) Then
-          CustomFlags = CustomFlags Or D3DCLEAR_TARGET
-    ElseIf (flags And CLEAR_STENCIL) Then
-          CustomFlags = CustomFlags Or D3DCLEAR_STENCIL
-    ElseIf (flags And CLEAR_DEPTH) Then
-          CustomFlags = CustomFlags Or D3DCLEAR_ZBUFFER
-    End If
-
-    With D3DDevice
-                    
-        .Clear 1, ClearRect, CustomFlags, 0, 1#, 0
-        .BeginScene
-    
-    End With
-End Sub
-
-Private Sub clsGraphicalDevice_EndScene(DestRect As RECT, hwnd As Long)
-
-    With D3DDevice
-                    
-        'Flip the backbuffer to the screen
-        .Present DestRect, DestRect, hwnd, ByVal 0&
-        .EndScene
-    
-    End With
-=======
 Private Sub clsGraphicalDevice_BeginScene(ClearRect As RECT, flags As CLEAR_FLAGS, Optional Blur As Boolean = False)
     Dim CustomFlags As Long
 
@@ -1077,7 +1002,6 @@ Private Sub clsGraphicalDevice_EndScene(DestRect As RECT, hWnd As Long)
     ' Flip the backbuffer to the screen
     D3DDevice.Present DestRect, DestRect, hWnd, ByVal 0&
     D3DDevice.EndScene
->>>>>>> parra_branch
     
 End Sub
 
@@ -1086,11 +1010,7 @@ On Error GoTo errHandle
 
     Dim TexSizeW As Integer, TexSizeH As Integer
     
-<<<<<<< HEAD
-    TexSizeW = 800: TexSizeH = 600
-=======
     TexSizeW = 800: TexSizeH = 600 ' TODO: Avoid hardcoding here
->>>>>>> parra_branch
 
     'Configure MotionBlur code
     Set m_pDisplayTexture = D3DX.CreateTexture(D3DDevice, TexSizeW, TexSizeH, 1, D3DUSAGE_RENDERTARGET, DispMode.format, D3DPOOL_DEFAULT)
@@ -1132,28 +1052,17 @@ errHandle:
 End Function
 
 Private Sub clsGraphicalDevice_fontRender(ByRef Text As String, ByRef index As Byte, _
-<<<<<<< HEAD
-                            ByRef x As Integer, ByRef y As Integer, _
-=======
                             ByRef X As Integer, ByRef Y As Integer, _
->>>>>>> parra_branch
                             ByRef Width As Integer, ByRef Height As Integer, _
                             format As Long)
 
     Static fontRect As RECT 'This defines where it will be
     
     With fontRect
-<<<<<<< HEAD
-        .Top = y + RenderRect.Top
-        .Left = x + RenderRect.Left
-        .Bottom = y + Height + RenderRect.Top
-        .Right = x + Width + RenderRect.Left
-=======
         .Top = Y + RenderRect.Top
         .Left = X + RenderRect.Left
         .Bottom = Y + Height + RenderRect.Top
         .Right = X + Width + RenderRect.Left
->>>>>>> parra_branch
     End With
     
     D3DX.DrawText Font(index).MainFont, Font(index).Color, Text, fontRect, format

@@ -323,6 +323,7 @@ End With
 End Sub
 Public Sub UpdateParticleGroup(grIndex As Integer, sngNewX As Single, sngNewY As Single)
     Dim I As Long
+    Dim OffsetDiffX As Single, OffsetDiffY As Single
     Dim sngElapsedTime As Single
     
     With ParticleGroup(grIndex)
@@ -331,13 +332,17 @@ Public Sub UpdateParticleGroup(grIndex As Integer, sngNewX As Single, sngNewY As
         sngElapsedTime = (GetTickCount() - .lngPreviousFrame) / 100
         .lngPreviousFrame = GetTickCount()
         
+        OffsetDiffX = sngNewX - .sngX
+        OffsetDiffY = sngNewY - .sngY
+        
+        
         .sngX = sngNewX
         .sngY = sngNewY
          
         For I = 0 To .ParticleCounts
+            UpdateParticle grIndex, I, sngElapsedTime, OffsetDiffX, OffsetDiffY
+        
             With .Particles(I)
-                UpdateParticle grIndex, I, sngElapsedTime
-                 
                 ' If the particle is invisible, reset it again.
                 If .sngA <= 0 Then
                     Reset grIndex, I
@@ -383,11 +388,11 @@ Private Sub ResetIt(grIndex As Integer, Particle As Long, X As Single, Y As Sing
     
 End Sub
  
-Private Sub UpdateParticle(grIndex As Integer, Particle As Long, sngTime As Single)
+Private Sub UpdateParticle(grIndex As Integer, Particle As Long, sngTime As Single, sngOffsetX As Single, sngOffsetY As Single)
     
     With ParticleGroup(grIndex).Particles(Particle)
-        .sngX = .sngX + .sngXSpeed * sngTime
-        .sngY = .sngY + .sngYSpeed * sngTime
+        .sngX = .sngX + .sngXSpeed * sngTime + sngOffsetX
+        .sngY = .sngY + .sngYSpeed * sngTime + sngOffsetY
      
         .sngXSpeed = .sngXSpeed + .sngXAccel * sngTime
         .sngYSpeed = .sngYSpeed + .sngYAccel * sngTime

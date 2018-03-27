@@ -1,6 +1,24 @@
 Attribute VB_Name = "modSocket"
 Option Explicit
 
+'****************************************************************************
+'    Parra Engine is a MMORPG Isometric Game Engine.
+'    Copyright (C) 2009 - 2013 Vicente Eduardo Ferrer Garcia
+'
+'    This program is free software: you can redistribute it and/or modify
+'    it under the terms of the GNU Affero General Public License as
+'    published by the Free Software Foundation, either version 3 of the
+'    License, or (at your option) any later version.
+'
+'    This program is distributed in the hope that it will be useful,
+'    but WITHOUT ANY WARRANTY; without even the implied warranty of
+'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+'    GNU Affero General Public License for more details.
+'
+'    You should have received a copy of the GNU Affero General Public License
+'    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+'****************************************************************************
+
 '==============================================================================
 'API FUNCTIONS
 '==============================================================================
@@ -425,7 +443,7 @@ lRetVal = api_lstrcpy(ByVal strTemp, ByVal lPointer)
 If lRetVal Then StringFromPointer = strTemp
 End Function
 
-'The function takes an unsigned Integer from and API and 
+'The function takes an unsigned Integer from and API andï¿½
 'converts it to a Long for display or arithmetic purposes
 Public Function UnsignedToInteger(Value As Long) As Integer
 If Value < 0 Or Value >= OFFSET_2 Then Error 6 ' Overflow
@@ -436,8 +454,8 @@ Else
 End If
 End Function
 
-'The function takes a Long containing a value in the range 
-'of an unsigned Integer and returns an Integer that you 
+'The function takes a Long containing a value in the rangeï¿½
+'of an unsigned Integer and returns an Integer that youï¿½
 'can pass to an API that requires an unsigned Integer
 Public Function IntegerToUnsigned(Value As Integer) As Long
 If Value < 0 Then

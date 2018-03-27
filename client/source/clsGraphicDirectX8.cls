@@ -13,6 +13,24 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
+'****************************************************************************
+'    Parra Engine is a MMORPG Isometric Game Engine.
+'    Copyright (C) 2009 - 2013 Vicente Eduardo Ferrer Garcia
+'
+'    This program is free software: you can redistribute it and/or modify
+'    it under the terms of the GNU Affero General Public License as
+'    published by the Free Software Foundation, either version 3 of the
+'    License, or (at your option) any later version.
+'
+'    This program is distributed in the hope that it will be useful,
+'    but WITHOUT ANY WARRANTY; without even the implied warranty of
+'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+'    GNU Affero General Public License for more details.
+'
+'    You should have received a copy of the GNU Affero General Public License
+'    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+'****************************************************************************
+
 ' DOC: Type that hold info about a display mode
 Private Type D3DUTIL_MODEINFO
     lWidth As Long                                  'Screen width in this mode
@@ -1429,8 +1447,8 @@ On Error GoTo ErrHandler
 Exit Function
 
 ErrHandler:
-    MsgBox "Un error inesperado ocurrió al intentar cargar el gráfico " & CStr(fileIndex) & ".png" & ". " & vbCrLf & _
-                "El código de error es " & CStr(Err.number) & " - " & Err.Description & vbCrLf & vbCrLf & "Copia este mensaje y notifica a los administradores.", _
+    MsgBox "Un error inesperado ocurriï¿½ al intentar cargar el grï¿½fico " & CStr(fileIndex) & ".png" & ". " & vbCrLf & _
+                "El cï¿½digo de error es " & CStr(Err.number) & " - " & Err.Description & vbCrLf & vbCrLf & "Copia este mensaje y notifica a los administradores.", _
                 vbOKOnly Or vbCritical Or vbExclamation, "Error"
     End
 End Function

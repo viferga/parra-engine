@@ -14,26 +14,26 @@ Attribute VB_Exposed = False
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '''' Version 0.1.0                                                                                                          ''''
 ''''                                                                                                                        ''''
-'''' Esta clase, genera un número aleatorio desde una frase...                                                              ''''
+'''' Esta clase, genera un nï¿½mero aleatorio desde una frase...                                                              ''''
 ''''                                                                                                                        ''''
 '''' Agradezco a ElYind por su idea original, codeada por mi.                                                               ''''
 ''''                                                                                                                        ''''
-'''' Lo unico malo de esta clase, es que la longitud y el tamaño de la cadena de                                            ''''
+'''' Lo unico malo de esta clase, es que la longitud y el tamaï¿½o de la cadena de                                            ''''
 '''' texto se triplica al original, pero si tenemos un buen host, vale la pena                                              ''''
-'''' la implementación.                                                                                                     ''''
+'''' la implementaciï¿½n.                                                                                                     ''''
 ''''                                                                                                                        ''''
-'''' Aunque, como verán en la iniciación de la clase se setea un Array (sugerencia de Parra),                               ''''
-'''' yo quería hacerlo con un Select Case o If/ElseIf :P. Que no está terminado, y en las funciones                         ''''
-'''' de randomize y read están comentadas... pero ya está casi todo echo, el que se pone la termina                         ''''
+'''' Aunque, como verï¿½n en la iniciaciï¿½n de la clase se setea un Array (sugerencia de Parra),                               ''''
+'''' yo querï¿½a hacerlo con un Select Case o If/ElseIf :P. Que no estï¿½ terminado, y en las funciones                         ''''
+'''' de randomize y read estï¿½n comentadas... pero ya estï¿½ casi todo echo, el que se pone la termina                         ''''
 '''' en menos de 2 horas ;P.                                                                                                ''''
-'''' La función es básica, tomamos de a dos caracteres de los números generados (XX) y lo reemplaza por                     ''''
+'''' La funciï¿½n es bï¿½sica, tomamos de a dos caracteres de los nï¿½meros generados (XX) y lo reemplaza por                     ''''
 '''' un caracter, hay que tener en cuenta que podemos tener 01 02 10 90 52 etc, todas las combinaciones posibles            ''''
 '''' y a la hora de leer la frase, es cuestion de usar un Replace() o mismo con un for, como gusten.                        ''''
 ''''                                                                                                                        ''''
-'''' Esto fué generado, con la idea de armar una dll para distribuir en todos lo servidores y usar                          ''''
-'''' algún .ini o .dat externo para que no sea en todos los servers iguales :P.                                             ''''
+'''' Esto fuï¿½ generado, con la idea de armar una dll para distribuir en todos lo servidores y usar                          ''''
+'''' algï¿½n .ini o .dat externo para que no sea en todos los servers iguales :P.                                             ''''
 ''''                                                                                                                        ''''
-'''' Justo con los chicos salió la idea de un server y bueno... no se logró, cualquier cosa,                                ''''
+'''' Justo con los chicos saliï¿½ la idea de un server y bueno... no se logrï¿½, cualquier cosa,                                ''''
 '''' les dejo mi mail para que me contacten si tienen ganas. thomy.-@hotmail.com                                            ''''
 ''''                                                                                                                        ''''
 ''''                                                                                              Buenos Aires, Argentina   ''''
@@ -41,6 +41,24 @@ Attribute VB_Exposed = False
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 Option Explicit
+
+'****************************************************************************
+'    Parra Engine is a MMORPG Isometric Game Engine.
+'    Copyright (C) 2009 - 2013 Vicente Eduardo Ferrer Garcia
+'
+'    This program is free software: you can redistribute it and/or modify
+'    it under the terms of the GNU Affero General Public License as
+'    published by the Free Software Foundation, either version 3 of the
+'    License, or (at your option) any later version.
+'
+'    This program is distributed in the hope that it will be useful,
+'    but WITHOUT ANY WARRANTY; without even the implied warranty of
+'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+'    GNU Affero General Public License for more details.
+'
+'    You should have received a copy of the GNU Affero General Public License
+'    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+'****************************************************************************
 
 Private CaracterDividido(0 To 255) As String
 
@@ -54,11 +72,11 @@ Private Sub Class_Initialize()
 Dim a As Integer, b As Integer
 
 CaracterDividido(10) = "@"
-CaracterDividido(11) = "®"
-CaracterDividido(12) = "•"
+CaracterDividido(11) = "ï¿½"
+CaracterDividido(12) = "ï¿½"
 CaracterDividido(13) = "k"
-CaracterDividido(14) = "é"
-CaracterDividido(15) = "Ó"
+CaracterDividido(14) = "ï¿½"
+CaracterDividido(15) = "ï¿½"
 CaracterDividido(16) = "4"
 CaracterDividido(17) = "."
 CaracterDividido(18) = ";"
@@ -67,44 +85,44 @@ CaracterDividido(20) = ","
 CaracterDividido(21) = "-"
 CaracterDividido(22) = "_"
 CaracterDividido(23) = "'"
-CaracterDividido(24) = "à"
+CaracterDividido(24) = "ï¿½"
 CaracterDividido(25) = "A"
-CaracterDividido(26) = "¤"
+CaracterDividido(26) = "ï¿½"
 CaracterDividido(27) = "$"
-CaracterDividido(28) = "€"
-CaracterDividido(29) = "×"
+CaracterDividido(28) = "ï¿½"
+CaracterDividido(29) = "ï¿½"
 CaracterDividido(30) = "x"
 CaracterDividido(31) = "+"
 CaracterDividido(32) = "^"
 CaracterDividido(33) = "*"
-CaracterDividido(34) = "±"
-CaracterDividido(35) = "‡"
-CaracterDividido(36) = "÷"
+CaracterDividido(34) = "ï¿½"
+CaracterDividido(35) = "ï¿½"
+CaracterDividido(36) = "ï¿½"
 CaracterDividido(37) = ""
-CaracterDividido(38) = "ç"
-CaracterDividido(39) = "Ç"
-CaracterDividido(40) = "¨"
+CaracterDividido(38) = "ï¿½"
+CaracterDividido(39) = "ï¿½"
+CaracterDividido(40) = "ï¿½"
 CaracterDividido(41) = "{"
 CaracterDividido(42) = "}"
 CaracterDividido(43) = "["
 CaracterDividido(44) = "]"
 CaracterDividido(45) = "#"
 CaracterDividido(46) = "~"
-CaracterDividido(47) = "¬"
+CaracterDividido(47) = "ï¿½"
 CaracterDividido(48) = "\"
 CaracterDividido(49) = "/"
-CaracterDividido(50) = "¿"
+CaracterDividido(50) = "ï¿½"
 CaracterDividido(51) = "?"
 CaracterDividido(52) = "="
-CaracterDividido(53) = "æ"
-CaracterDividido(54) = "Ö"
+CaracterDividido(53) = "ï¿½"
+CaracterDividido(54) = "ï¿½"
 CaracterDividido(55) = "!"
-CaracterDividido(56) = "¡"
-CaracterDividido(57) = "µ"
-CaracterDividido(58) = "œ"
-CaracterDividido(59) = "™"
-CaracterDividido(60) = "…"
-CaracterDividido(61) = "†"
+CaracterDividido(56) = "ï¿½"
+CaracterDividido(57) = "ï¿½"
+CaracterDividido(58) = "ï¿½"
+CaracterDividido(59) = "ï¿½"
+CaracterDividido(60) = "ï¿½"
+CaracterDividido(61) = "ï¿½"
 CaracterDividido(62) = "|"
 CaracterDividido(63) = "<"
 CaracterDividido(64) = ">"
@@ -212,7 +230,7 @@ Dim count As Long
 
 'phrase = backup
 
-count = (Len(phrase) / 3) ' recordemos la operacion matemática ...
+count = (Len(phrase) / 3) ' recordemos la operacion matemï¿½tica ...
 aleatoriedad = Left$(phrase, 3) - Right$(phrase, 3)
 phrase = Right$(phrase, Len(phrase) - 3)
 

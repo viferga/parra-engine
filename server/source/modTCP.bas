@@ -1,6 +1,24 @@
 Attribute VB_Name = "modTCP"
 Option Explicit
 
+'****************************************************************************
+'    Parra Engine is a MMORPG Isometric Game Engine.
+'    Copyright (C) 2009 - 2013 Vicente Eduardo Ferrer Garcia
+'
+'    This program is free software: you can redistribute it and/or modify
+'    it under the terms of the GNU Affero General Public License as
+'    published by the Free Software Foundation, either version 3 of the
+'    License, or (at your option) any later version.
+'
+'    This program is distributed in the hope that it will be useful,
+'    but WITHOUT ANY WARRANTY; without even the implied warranty of
+'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+'    GNU Affero General Public License for more details.
+'
+'    You should have received a copy of the GNU Affero General Public License
+'    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+'****************************************************************************
+
 Public Enum sckStatus
         sNone = 0
         sOnAcc = 1
@@ -58,7 +76,7 @@ On Error GoTo errSock
     
 errSock:
     Debug.Print "Critical error when initializing Sockets"
-    Consola "¡¡¡Server error when trying to establish connection!!!"
+    Consola "ï¿½ï¿½ï¿½Server error when trying to establish connection!!!"
     
     sockInitialize = False
 End Function

@@ -2,23 +2,41 @@ Attribute VB_Name = "modPlayer"
 Option Explicit
 Option Base 1
 
+'****************************************************************************
+'    Parra Engine is a MMORPG Isometric Game Engine.
+'    Copyright (C) 2009 - 2013 Vicente Eduardo Ferrer Garcia
+'
+'    This program is free software: you can redistribute it and/or modify
+'    it under the terms of the GNU Affero General Public License as
+'    published by the Free Software Foundation, either version 3 of the
+'    License, or (at your option) any later version.
+'
+'    This program is distributed in the hope that it will be useful,
+'    but WITHOUT ANY WARRANTY; without even the implied warranty of
+'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+'    GNU Affero General Public License for more details.
+'
+'    You should have received a copy of the GNU Affero General Public License
+'    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+'****************************************************************************
+
 Public Const MAX_INVENTORY_SLOT   As Byte = 20
 Public Const MAX_INVENTORY_OBJS   As Long = 50000
 
 Private Enum eClass
     Mage = 1    'Mago
-    Cleric      'Clérigo
+    Cleric      'Clï¿½rigo
     Warrior     'Guerrero
     Assasin     'Asesino
-    Thief       'Ladrón
+    Thief       'Ladrï¿½n
     Bard        'Bardo
     Druid       'Druida
     Bandit      'Bandido
-    Paladin     'Paladín
+    Paladin     'Paladï¿½n
     Hunter      'Cazador
     Fisher      'Pescador
     Blacksmith  'Herrero
-    Lumberjack  'Leñador
+    Lumberjack  'Leï¿½ador
     Miner       'Minero
     Carpenter   'Carpintero
     Pirat       'Pirata

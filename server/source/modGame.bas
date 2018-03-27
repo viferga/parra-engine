@@ -1,6 +1,24 @@
 Attribute VB_Name = "modGame"
 Option Explicit
 
+'****************************************************************************
+'    Parra Engine is a MMORPG Isometric Game Engine.
+'    Copyright (C) 2009 - 2013 Vicente Eduardo Ferrer Garcia
+'
+'    This program is free software: you can redistribute it and/or modify
+'    it under the terms of the GNU Affero General Public License as
+'    published by the Free Software Foundation, either version 3 of the
+'    License, or (at your option) any later version.
+'
+'    This program is distributed in the hope that it will be useful,
+'    but WITHOUT ANY WARRANTY; without even the implied warranty of
+'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+'    GNU Affero General Public License for more details.
+'
+'    You should have received a copy of the GNU Affero General Public License
+'    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+'****************************************************************************
+
 'Swich on/off the program
 Public prgRun As Boolean
 
@@ -65,7 +83,7 @@ Private Sub gameLoad()
      modGame.gameLoadTime
      
     'Load characters
-     If modCharacter.characterInitialize = False Then Consola "¡¡¡Critical error when initializing characters!!!" Else Consola "Initializing characters correctly..."
+     If modCharacter.characterInitialize = False Then Consola "ï¿½ï¿½ï¿½Critical error when initializing characters!!!" Else Consola "Initializing characters correctly..."
     
     'AOBot is running!
     #If Testing = 0 Then
@@ -109,7 +127,7 @@ End Sub
 Public Sub Main()
     
     If (App.PrevInstance) Then
-        MsgBox "El servidor ya está abierto."
+        MsgBox "El servidor ya estï¿½ abierto."
         End
     End If
     

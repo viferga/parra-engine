@@ -68,6 +68,24 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
 
+'****************************************************************************
+'    Parra Engine is a MMORPG Isometric Game Engine.
+'    Copyright (C) 2009 - 2013 Vicente Eduardo Ferrer Garcia
+'
+'    This program is free software: you can redistribute it and/or modify
+'    it under the terms of the GNU Affero General Public License as
+'    published by the Free Software Foundation, either version 3 of the
+'    License, or (at your option) any later version.
+'
+'    This program is distributed in the hope that it will be useful,
+'    but WITHOUT ANY WARRANTY; without even the implied warranty of
+'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+'    GNU Affero General Public License for more details.
+'
+'    You should have received a copy of the GNU Affero General Public License
+'    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+'****************************************************************************
+
 Private MousePicX As Single: Private MousePicY As Single
 Private cMouse As Boolean
 
@@ -174,7 +192,7 @@ Private Sub Winsock_Error(ByVal Number As Integer, Description As String, ByVal 
     ' Handle socket errors
 
     If Number = 10061 Then
-        MsgBox "No se ha podido establecer conexión con el servidor.", vbCritical
+        MsgBox "No se ha podido establecer conexiï¿½n con el servidor.", vbCritical
     Else
         MsgBox Description, vbApplicationModal + vbInformation + vbOKOnly + vbDefaultButton1, "Error"
     End If
